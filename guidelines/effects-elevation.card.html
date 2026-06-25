@@ -1,0 +1,25 @@
+<!-- @dsCard group="Effects" viewport="700x180" name="Warm Elevation" subtitle="Brown-tinted multi-layer shadows + top inner highlight" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; background: var(--bg); padding: 30px 24px; font-family: var(--font-ui); color: var(--text); }
+  .row { display:flex; gap: 24px; align-items:center; justify-content:space-between; }
+  .item { text-align:center; }
+  .box { width: 96px; height: 70px; background: var(--surface); border-radius: var(--radius-md);
+         border: 1px solid var(--hairline); margin: 0 auto; }
+  .item b { display:block; font-size: 11px; margin-top: 14px; color: var(--text-muted); letter-spacing:.06em; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-1),var(--inset-top)"></div><b>shadow-1</b></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-2),var(--inset-top)"></div><b>shadow-2</b></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-3),var(--inset-top)"></div><b>shadow-3</b></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-4),var(--inset-top)"></div><b>shadow-4</b></div>
+    <div class="item"><div class="box" style="box-shadow:var(--shadow-5),var(--inset-top)"></div><b>shadow-5</b></div>
+  </div>
+</body>
+</html>

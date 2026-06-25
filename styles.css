@@ -1,0 +1,11 @@
+/* ============================================================
+   SEQUIN DESIGN SYSTEM — global entry point
+   Consumers link only this file. It is an @import manifest;
+   keep it that way (no rules inline here).
+   ============================================================ */
+@import "tokens/fonts.css";
+@import "tokens/colors.css";
+@import "tokens/typography.css";
+@import "tokens/spacing.css";
+@import "tokens/effects.css";
+@import "tokens/base.css";

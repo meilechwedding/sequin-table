@@ -1,0 +1,227 @@
+<!-- @dsCard group="Storefront" viewport="1440x860" name="Sequin Storefront" subtitle="Full storefront — hero, collections, catalog, cart" -->
+<!-- @startingPoint section="Storefront" subtitle="Full Sequin storefront homepage with cart" viewport="1440x900" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sequin — Upscale Table Linen</title>
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--bg); }
+
+  /* ─── Scroll reveal ─────────────────────────────────── */
+  .sq-rv { opacity: 0; transform: translateY(10px);
+    transition: opacity 600ms cubic-bezier(.4,0,.2,1), transform 600ms cubic-bezier(.4,0,.2,1); }
+  .sq-rv.sq-show { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .sq-rv { opacity:1; transform:none; transition:none; } }
+
+  /* ─── Focus rings ────────────────────────────────────── */
+  :focus-visible { outline: 1.5px solid #BE9A6E; outline-offset: 3px; }
+
+  /* ─── Toast ─────────────────────────────────────────── */
+  #sq-toast {
+    position: fixed; left: 50%; bottom: 30px;
+    transform: translateX(-50%) translateY(120%);
+    z-index: 120; background: var(--espresso-900); color: var(--cream-50);
+    padding: 13px 22px; border-radius: var(--radius-pill);
+    box-shadow: var(--shadow-4); display: flex; align-items: center;
+    gap: 10px; font-size: 13px; letter-spacing: .04em;
+    border: 1px solid var(--border-gold);
+    transition: transform .45s cubic-bezier(.4,0,.2,1);
+  }
+  #sq-toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── Tweaks ─────────────────────────────────────────── */
+  body[data-atmo="candlelit"] {
+    --bg: radial-gradient(125% 135% at 30% -10%, #3c2b15 0%, #241807 55%, #160f06 100%);
+    --bg-veil: #241806; --surface-2: #2a1c0d; --surface-sunk: #1e1407;
+    --accent: var(--gold-300); --accent-text: var(--gold-300);
+  }
+  body[data-op="understated"] {
+    --shadow-2: 0 1px 3px rgba(40,28,14,.06); --shadow-3: 0 2px 6px rgba(40,28,14,.07);
+    --shadow-4: 0 4px 12px rgba(40,28,14,.08); --shadow-5: 0 8px 22px rgba(40,28,14,.11);
+    --glow-gold: 0 0 0 1px var(--border-gold); --glow-gold-soft: 0 1px 3px rgba(40,28,14,.06);
+  }
+  body[data-op="understated"] .foil-text--animated { animation: none; }
+  body[data-op="understated"] .sq-pc2:hover img { transform: none !important; }
+  body[data-op="understated"] .sq-lane:hover img { transform: none !important; }
+  body[data-op="maximal"] {
+    --shadow-4: var(--shadow-5);
+    --shadow-5: 0 26px 54px rgba(40,28,14,.20), 0 80px 140px rgba(40,28,14,.34);
+  }
+  body[data-op="maximal"] .sq-pc2:hover img { transform: scale(1.06) !important; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" src="tweaks-panel.jsx?v=2"></script>
+
+<script type="text/babel" src="Header.jsx?v=2"></script>
+<script type="text/babel" src="Hero.jsx?v=2"></script>
+<script type="text/babel" src="AboutStrip.jsx?v=2"></script>
+<script type="text/babel" src="Collections.jsx?v=2"></script>
+<script type="text/babel" src="Catalog.jsx?v=2"></script>
+<script type="text/babel" src="Process.jsx?v=2"></script>
+<script type="text/babel" src="Testimonials.jsx?v=2"></script>
+<script type="text/babel" src="Footer.jsx?v=2"></script>
+<script type="text/babel" src="CartDrawer.jsx?v=2"></script>
+
+<script type="text/babel">
+  const { useState, useEffect, useRef } = React;
+  const priceNum = (s) => parseInt(String(s).replace(/[^0-9]/g,""),10) || 0;
+
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "atmosphere": "linen",
+    "opulence":   "refined",
+    "metal":      "champagne"
+  }/*EDITMODE-END*/;
+
+  const METAL_KEYS = [
+    "--foil-gold","--foil-gold-soft","--accent","--accent-strong","--accent-text",
+    "--accent-soft","--border-gold","--glow-gold","--glow-gold-soft","--bevel-gold",
+    "--ring","--gold-300","--gold-400","--gold-500",
+  ];
+  const METALS = {
+    champagne: null,
+    rose: {
+      "--foil-gold": "linear-gradient(135deg,#7c4a3a 0%,#d99a86 22%,#f4ddd4 38%,#c98a76 52%,#e8c2b4 68%,#a85c48 86%,#d9a896 100%)",
+      "--foil-gold-soft": "linear-gradient(135deg,#c98a76 0%,#e8c2b4 50%,#c98a76 100%)",
+      "--accent":"#d4a08c","--accent-strong":"#a85c48","--accent-text":"#a85c48",
+      "--accent-soft":"rgba(212,160,140,.18)","--border-gold":"rgba(212,160,140,.55)",
+      "--glow-gold":"0 0 0 1px rgba(232,194,180,.5), 0 8px 30px rgba(212,160,140,.38)",
+      "--glow-gold-soft":"0 6px 26px rgba(212,160,140,.3)",
+      "--bevel-gold":"inset 0 1px 0 rgba(255,240,235,.65), inset 0 -2px 4px rgba(140,74,58,.4)",
+      "--ring":"rgba(212,160,140,.55)",
+      "--gold-300":"#e8c2b4","--gold-400":"#d99a86","--gold-500":"#c98a76",
+    },
+    pewter: {
+      "--foil-gold": "linear-gradient(135deg,#55565c 0%,#c4c6cc 22%,#eef0f3 38%,#9a9ca3 52%,#d6d8de 68%,#74767d 86%,#c0c2c8 100%)",
+      "--foil-gold-soft": "linear-gradient(135deg,#9a9ca3 0%,#d6d8de 50%,#9a9ca3 100%)",
+      "--accent":"#b9bbc2","--accent-strong":"#7a7c83","--accent-text":"#8a8c93",
+      "--accent-soft":"rgba(185,187,194,.18)","--border-gold":"rgba(200,202,208,.5)",
+      "--glow-gold":"0 0 0 1px rgba(230,232,236,.5), 0 8px 30px rgba(185,187,194,.34)",
+      "--glow-gold-soft":"0 6px 26px rgba(185,187,194,.28)",
+      "--bevel-gold":"inset 0 1px 0 rgba(255,255,255,.7), inset 0 -2px 4px rgba(90,92,98,.4)",
+      "--ring":"rgba(185,187,194,.55)",
+      "--gold-300":"#e6e8ec","--gold-400":"#c4c6cc","--gold-500":"#b9bbc2",
+    },
+  };
+
+  function App() {
+    const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+    const [filter,    setFilter]    = useState("all");
+    const [favs,      setFavs]      = useState({});
+    const [cart,      setCart]      = useState({});
+    const [cartOpen,  setCartOpen]  = useState(false);
+    const [nav,       setNav]       = useState("home");
+
+    useEffect(() => { window.lucide && window.lucide.createIcons(); });
+
+    /* Apply atmosphere / opulence / metal tweaks */
+    useEffect(() => {
+      const b = document.body;
+      b.dataset.atmo = t.atmosphere;
+      b.dataset.op   = t.opulence;
+      if (t.atmosphere === "linen") b.removeAttribute("data-theme");
+      else b.setAttribute("data-theme","noir");
+      const metal = METALS[t.metal];
+      METAL_KEYS.forEach(k => b.style.removeProperty(k));
+      if (metal) Object.entries(metal).forEach(([k,v]) => b.style.setProperty(k,v));
+    }, [t.atmosphere, t.opulence, t.metal]);
+
+    /* Hash-scroll on load (for Collections link from sub-pages) */
+    useEffect(() => {
+      if (window.location.hash === "#catalog") {
+        const el = document.getElementById("catalog");
+        if (el) setTimeout(() => window.scrollTo({ top: el.offsetTop - 70, behavior: "smooth" }), 400);
+      }
+    }, []);
+
+    const toast = (msg) => {
+      const el = document.getElementById("sq-toast"); if (!el) return;
+      el.querySelector("span").textContent = msg;
+      el.classList.add("show");
+      clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove("show"), 2200);
+    };
+
+    const fav    = (id) => setFavs(s => ({ ...s, [id]: !s[id] }));
+    const add    = (p)  => {
+      setCart(c => {
+        const cur = c[p.id];
+        return { ...c, [p.id]: { ...p, qtyPrice: priceNum(p.price), qty: cur ? cur.qty+1 : 1 } };
+      });
+      toast(`${p.name} added to cart`);
+    };
+    const adjQty = (id, d) => setCart(c => {
+      const it = c[id]; if (!it) return c;
+      const q  = it.qty + d;
+      if (q <= 0) { const n = {...c}; delete n[id]; return n; }
+      return { ...c, [id]: { ...it, qty: q } };
+    });
+    const remove = (id) => setCart(c => { const n = {...c}; delete n[id]; return n; });
+    const count  = Object.values(cart).reduce((s,i) => s+i.qty, 0);
+
+    const goShop = (which) => {
+      setFilter(which === "rental" ? "rental" : which === "home" ? "home" : "all");
+      setNav(which);
+      const el = document.getElementById("catalog");
+      if (el) window.scrollTo({ top: el.offsetTop - 70, behavior: "smooth" });
+    };
+
+    const handleNav = (id, href) => {
+      if (["rent","buy","about","process"].includes(id)) { window.location.href = href; return; }
+      if (id === "collections") {
+        const el = document.getElementById("catalog");
+        if (el) window.scrollTo({ top: el.offsetTop - 70, behavior: "smooth" });
+        return;
+      }
+      if (id === "home") { window.scrollTo({ top:0, behavior:"smooth" }); setNav("home"); return; }
+      setNav(id);
+    };
+
+    return (
+      <React.Fragment>
+        <SequinHeader cartCount={count} onCart={() => setCartOpen(true)} active={nav} onNav={handleNav} />
+        <SequinHero onShop={goShop} />
+        <SequinCollections onOpen={goShop} />
+        <SequinCatalog filter={filter} onFilter={setFilter} favs={favs} onFav={fav} onAdd={add} />
+        <SequinFooter />
+        <SequinCartDrawer open={cartOpen} items={cart} onClose={() => setCartOpen(false)} onQty={adjQty} onRemove={remove} />
+
+        <TweaksPanel title="Tweaks">
+          <TweakSection label="Atmosphere">
+            <p style={{margin:"-2px 0 10px",fontSize:11.5,lineHeight:1.45,opacity:.62}}>The light &amp; mood of the room.</p>
+          </TweakSection>
+          <TweakRadio label="Mood" value={t.atmosphere} options={["linen","candlelit","noir"]}
+            onChange={v => setTweak("atmosphere",v)} />
+          <TweakSection label="Opulence">
+            <p style={{margin:"-2px 0 10px",fontSize:11.5,lineHeight:1.45,opacity:.62}}>Shadows, glow &amp; shimmer — all at once.</p>
+          </TweakSection>
+          <TweakRadio label="Drama" value={t.opulence} options={["understated","refined","maximal"]}
+            onChange={v => setTweak("opulence",v)} />
+          <TweakSection label="Accent Metal">
+            <p style={{margin:"-2px 0 10px",fontSize:11.5,lineHeight:1.45,opacity:.62}}>Recolors every gold surface.</p>
+          </TweakSection>
+          <TweakRadio label="Metal" value={t.metal} options={["champagne","rose","pewter"]}
+            onChange={v => setTweak("metal",v)} />
+        </TweaksPanel>
+      </React.Fragment>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+
+<div id="sq-toast"><i data-lucide="check"></i><span>Added to cart</span></div>
+<script>
+  document.getElementById("root").after(document.getElementById("sq-toast"));
+</script>
+</body>
+</html>

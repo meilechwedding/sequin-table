@@ -1,0 +1,29 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Bordeaux & Sage" subtitle="Deep feature accent and muted greenery" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; background: var(--bg); padding: 22px; font-family: var(--font-ui); }
+  .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+  .sw { border-radius: var(--radius-md); height: 80px; display: flex; flex-direction: column;
+        justify-content: flex-end; padding: 9px; box-shadow: var(--shadow-1); border: 1px solid var(--hairline); }
+  .sw b { font-size: 11px; font-weight: 600; }
+  .sw span { font-size: 10px; opacity: .72; font-variant-numeric: tabular-nums; }
+  .dark b, .dark span { color: var(--cream-50); }
+  .light b, .light span { color: var(--espresso-900); }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="sw dark"  style="background:var(--bordeaux-800)"><b>bx-800</b><span>#3c0e16</span></div>
+    <div class="sw dark"  style="background:var(--bordeaux-700)"><b>bx-700</b><span>#531320</span></div>
+    <div class="sw dark"  style="background:var(--bordeaux-600)"><b>bx-600</b><span>#6e1b2a</span></div>
+    <div class="sw dark"  style="background:var(--bordeaux-500)"><b>bx-500</b><span>#8c2434</span></div>
+    <div class="sw dark"  style="background:var(--sage-600)"><b>sage-600</b><span>#5f6a4d</span></div>
+    <div class="sw light" style="background:var(--sage-400)"><b>sage-400</b><span>#9aa487</span></div>
+    <div class="sw light" style="background:var(--sage-300)"><b>sage-300</b><span>#bcc3ac</span></div>
+  </div>
+</body>
+</html>

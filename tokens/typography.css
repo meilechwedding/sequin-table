@@ -1,0 +1,59 @@
+/* ============================================================
+   SEQUIN — Typography tokens
+   Headings/logo : Playfair Display (luxe high-contrast serif)
+   Body/UI       : Jost  (geometric deco sans)
+   ============================================================ */
+:root {
+  /* ---------- Families ---------- */
+  --font-display: "Playfair Display", "Cormorant Garamond", Garamond, serif;
+  --font-ui:      "Jost", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif:   "Playfair Display", "Cormorant Garamond", Garamond, serif;
+
+  /* ---------- Weights ---------- */
+  --fw-light:   300; /* @kind other */
+  --fw-regular: 400; /* @kind other */
+  --fw-medium:  500; /* @kind other */
+  --fw-semi:    600; /* @kind other */
+  --fw-bold:    700; /* @kind other */
+
+  /* ---------- Tracking (Jost looks best slightly tracked, caps wide) ---------- */
+  --track-tight:   -0.01em; /* @kind other */
+  --track-normal:  0em;      /* @kind other */
+  --track-wide:    0.08em;   /* @kind other */
+  --track-wider:   0.18em;   /* @kind other */
+  --track-widest:  0.32em;   /* @kind other */
+
+  /* ---------- Line heights ---------- */
+  --lh-tight:  1.04; /* @kind other */
+  --lh-snug:   1.18; /* @kind other */
+  --lh-normal: 1.5;  /* @kind other */
+  --lh-relax:  1.65; /* @kind other */
+
+  /* ---------- Fluid type scale ---------- */
+  --text-xs:   0.75rem;   /* 12 */
+  --text-sm:   0.875rem;  /* 14 */
+  --text-base: 1rem;      /* 16 */
+  --text-md:   1.125rem;  /* 18 */
+  --text-lg:   1.375rem;  /* 22 */
+  --text-xl:   1.75rem;   /* 28 */
+  --text-2xl:  clamp(2rem, 1.4rem + 2.4vw, 2.75rem);   /* @kind spacing */
+  --text-3xl:  clamp(2.6rem, 1.6rem + 3.6vw, 3.75rem);  /* @kind spacing */
+  --text-4xl:  clamp(3.4rem, 2rem + 5.2vw, 5.5rem);     /* @kind spacing */
+  --text-5xl:  clamp(4.2rem, 2.2rem + 8vw, 8rem);       /* @kind spacing */
+
+  /* ---------- Semantic roles ---------- */
+  --type-eyebrow-size:    var(--text-xs);
+  --type-eyebrow-track:   var(--track-widest);
+  --type-eyebrow-weight:  var(--fw-medium);
+
+  --type-display-family:  var(--font-display);
+  --type-display-weight:  var(--fw-regular);
+  --type-display-track:   var(--track-normal);
+
+  --type-body-family:     var(--font-ui);
+  --type-body-size:       var(--text-base);
+  --type-body-weight:     var(--fw-regular);
+  --type-body-lh:         var(--lh-relax);
+
+  --type-quote-family:    var(--font-serif);
+}

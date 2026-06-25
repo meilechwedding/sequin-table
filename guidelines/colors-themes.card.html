@@ -1,0 +1,43 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Themes & Semantics" subtitle="Linen (light) vs Noir (dark) — same tokens, two moods" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; background: var(--bg); padding: 22px; font-family: var(--font-ui); display:flex; gap:16px; }
+  .pane { flex:1; border-radius: var(--radius-lg); padding: 18px; background: var(--bg);
+          box-shadow: var(--shadow-2); border: 1px solid var(--border); }
+  .pane .eyebrow { font-size: 11px; }
+  .pane h4 { margin:.3em 0 .5em; font-size: 20px; color: var(--text); }
+  .pane p { margin:0; font-size: 12px; color: var(--text-muted); }
+  .chips { display:flex; gap:7px; margin-top:12px; }
+  .chip { width:26px; height:26px; border-radius:50%; border:1px solid var(--hairline); }
+  .noir { background: var(--grad-noir); position:relative; }
+</style>
+</head>
+<body>
+  <div class="pane">
+    <div class="eyebrow">Theme · Linen</div>
+    <h4 class="display">Set the Table</h4>
+    <p>Light, airy, candle-warm. Default surface.</p>
+    <div class="chips">
+      <div class="chip" style="background:var(--accent)"></div>
+      <div class="chip" style="background:var(--feature)"></div>
+      <div class="chip" style="background:var(--surface)"></div>
+      <div class="chip" style="background:var(--text)"></div>
+    </div>
+  </div>
+  <div class="pane noir" data-theme="noir">
+    <div class="eyebrow">Theme · Noir</div>
+    <h4 class="display">Set the Table</h4>
+    <p>Dramatic dark luxe for hero moments.</p>
+    <div class="chips">
+      <div class="chip" style="background:var(--accent)"></div>
+      <div class="chip" style="background:var(--feature)"></div>
+      <div class="chip" style="background:var(--surface-2)"></div>
+      <div class="chip" style="background:var(--text)"></div>
+    </div>
+  </div>
+</body>
+</html>

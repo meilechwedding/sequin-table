@@ -1,0 +1,65 @@
+<!-- @dsCard group="Components" viewport="700x520" name="Surfaces — Cards & Product Cards" subtitle="Card variants + the 3D-tilt product card" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<style>
+  body { margin: 0; background: var(--bg); padding: 26px; font-family: var(--font-ui); color: var(--text); }
+  .lbl { font-size: 10px; letter-spacing:.2em; text-transform:uppercase; color: var(--text-faint); margin: 0 0 12px; }
+  .cards { display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .pcards { display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px; perspective: 1200px; }
+  .sq-iconbtn svg { stroke-width:1.6; width:50%; height:50%; }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="../../_ds_bundle.js"></script>
+  <script type="text/babel">
+    const { Card, ProductCard, Badge, Eyebrow, Button } = window.SequinDesignSystem_ec3cc5;
+    function Demo() {
+      const [fav, setFav] = React.useState({});
+      const t = (k) => setFav(s => ({...s, [k]: !s[k]}));
+      return (
+        <div>
+          <div className="lbl">Card variants</div>
+          <div className="cards">
+            <Card>
+              <Eyebrow>Default</Eyebrow>
+              <h3 className="display" style={{fontSize:22, margin:'.4em 0 .2em'}}>Linen Surface</h3>
+              <p className="muted" style={{margin:0, fontSize:13}}>Warm layered elevation with a polished top highlight.</p>
+            </Card>
+            <Card variant="glass">
+              <Eyebrow>Glass</Eyebrow>
+              <h3 className="display" style={{fontSize:22, margin:'.4em 0 .2em'}}>Frosted</h3>
+              <p className="muted" style={{margin:0, fontSize:13}}>For overlays on photography & nav.</p>
+            </Card>
+            <Card variant="feature">
+              <Eyebrow style={{color:'var(--gold-300)'}}>Feature</Eyebrow>
+              <h3 className="display" style={{fontSize:22, margin:'.4em 0 .2em', color:'#fff'}}>Bordeaux</h3>
+              <p style={{margin:'0 0 14px', fontSize:13, color:'rgba(255,255,255,.8)'}}>For special moments.</p>
+              <Button variant="primary" size="sm">Reserve</Button>
+            </Card>
+          </div>
+          <div className="lbl">Product cards · hover to tilt</div>
+          <div className="pcards">
+            <ProductCard image="../../assets/img/willow.jpg" category="Home Linen" name="Willow Runner"
+              price="$48" flag={<Badge>New</Badge>} favourited={!!fav.a} onFavourite={()=>t('a')} />
+            <ProductCard image="../../assets/img/lilac.jpg" category="Home Linen" name="Lilac Cloth"
+              price="$62" favourited={!!fav.b} onFavourite={()=>t('b')} />
+            <ProductCard image="../../assets/img/taupe.jpg" category="Rental" name="Taupe Pendant"
+              price="from $120" unit="/ day" flag={<Badge variant="feature">Rental</Badge>}
+              favourited={!!fav.c} onFavourite={()=>t('c')} />
+          </div>
+        </div>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById('root')).render(<Demo />);
+    setTimeout(() => window.lucide && window.lucide.createIcons(), 80);
+  </script>
+</body>
+</html>

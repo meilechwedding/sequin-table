@@ -1,0 +1,28 @@
+<!-- @dsCard group="Colors" viewport="700x150" name="Warm Neutrals" subtitle="Espresso → marble → linen cream" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; background: var(--bg); padding: 22px; font-family: var(--font-ui); }
+  .grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+  .sw { border-radius: var(--radius-md); height: 80px; display: flex; flex-direction: column;
+        justify-content: flex-end; padding: 9px; box-shadow: var(--shadow-1); border: 1px solid var(--hairline); }
+  .sw b { font-size: 11px; font-weight: 600; }
+  .sw span { font-size: 10px; opacity: .72; font-variant-numeric: tabular-nums; }
+  .dark b, .dark span { color: var(--cream-50); }
+  .light b, .light span { color: var(--espresso-900); }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="sw dark"  style="background:var(--espresso-950)"><b>espresso-950</b><span>#120d08</span></div>
+    <div class="sw dark"  style="background:var(--espresso-800)"><b>espresso-800</b><span>#2e2317</span></div>
+    <div class="sw dark"  style="background:var(--stone-600)"><b>stone-600</b><span>#6b5b46</span></div>
+    <div class="sw light" style="background:var(--taupe-300)"><b>taupe-300</b><span>#c8b7a0</span></div>
+    <div class="sw light" style="background:var(--linen-100)"><b>linen-100</b><span>#f3ecdd</span></div>
+    <div class="sw light" style="background:var(--cream-50)"><b>cream-50</b><span>#fbf6ec</span></div>
+  </div>
+</body>
+</html>

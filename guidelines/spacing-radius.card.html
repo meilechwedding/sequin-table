@@ -1,0 +1,27 @@
+<!-- @dsCard group="Spacing" viewport="700x160" name="Corner Radii" subtitle="Soft & rounded — never sharp" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; background: var(--bg); padding: 24px; font-family: var(--font-ui); color: var(--text); }
+  .row { display:flex; gap: 16px; }
+  .item { text-align:center; }
+  .box { width: 78px; height: 60px; background: var(--surface); border: 1px solid var(--border-gold);
+         box-shadow: var(--shadow-2), var(--inset-top); }
+  .item b { display:block; font-size: 11px; margin-top: 8px; color: var(--text-muted); }
+  .item span { font-size: 10px; color: var(--text-faint); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="item"><div class="box" style="border-radius:var(--radius-xs)"></div><b>xs</b><span>6px</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-sm)"></div><b>sm</b><span>10px</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-md)"></div><b>md</b><span>14px</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-lg)"></div><b>lg · card</b><span>20px</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-xl)"></div><b>xl</b><span>28px</span></div>
+    <div class="item"><div class="box" style="border-radius:var(--radius-pill)"></div><b>pill</b><span>999</span></div>
+  </div>
+</body>
+</html>

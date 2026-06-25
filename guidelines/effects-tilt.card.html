@@ -1,0 +1,46 @@
+<!-- @dsCard group="Effects" viewport="700x260" name="3D Tilt Card" subtitle="Cursor-tracked perspective tilt — hover the card" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; background: var(--bg); padding: 26px; font-family: var(--font-ui);
+         display:flex; gap: 22px; align-items:center; justify-content:center; perspective: 1100px; }
+  .card { width: 220px; border-radius: var(--radius-lg); overflow:hidden; background: var(--surface);
+          box-shadow: var(--shadow-3), var(--inset-top); transform-style: preserve-3d;
+          transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out); will-change: transform; }
+  .card img { height: 130px; width:100%; object-fit:cover; }
+  .meta { padding: 14px 16px; }
+  .meta .eyebrow { font-size: 10px; }
+  .meta h4 { margin:.3em 0 .1em; font-size: 18px; color: var(--text); }
+  .meta span { font-size: 12px; color: var(--text-muted); }
+  .hint { font-size: 12px; color: var(--text-faint); max-width: 16ch; line-height:1.5; }
+</style>
+</head>
+<body>
+  <div class="card" id="c">
+    <img src="../assets/img/willow.jpg" alt="" />
+    <div class="meta">
+      <div class="eyebrow">Home Linen</div>
+      <h4 class="display">Willow Runner</h4>
+      <span>from $48</span>
+    </div>
+  </div>
+  <p class="hint">Hover &mdash; the card tilts toward your cursor and lifts on warm shadow.</p>
+  <script>
+    const c = document.getElementById('c');
+    c.addEventListener('pointermove', e => {
+      const r = c.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      c.style.transform = `rotateY(${px*12}deg) rotateX(${-py*12}deg) translateY(-6px)`;
+      c.style.boxShadow = 'var(--shadow-5)';
+    });
+    c.addEventListener('pointerleave', () => {
+      c.style.transform = '';
+      c.style.boxShadow = 'var(--shadow-3), var(--inset-top)';
+    });
+  </script>
+</body>
+</html>

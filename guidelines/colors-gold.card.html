@@ -1,0 +1,35 @@
+<!-- @dsCard group="Colors" viewport="700x200" name="Champagne Gold" subtitle="The signature metal — rendered as foil, not flat color" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../styles.css" />
+<style>
+  body { margin: 0; background: var(--bg); padding: 22px; font-family: var(--font-ui); }
+  .row { display: flex; gap: 10px; }
+  .sw { flex: 1; border-radius: var(--radius-md); height: 92px; display: flex; flex-direction: column;
+        justify-content: flex-end; padding: 10px; box-shadow: var(--shadow-1), var(--inset-top);
+        border: 1px solid var(--hairline); }
+  .sw b { font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+  .sw span { font-size: 11px; opacity: .7; font-variant-numeric: tabular-nums; }
+  .dark b, .dark span { color: var(--cream-50); }
+  .light b, .light span { color: var(--espresso-900); }
+  .foil { margin-top: 14px; height: 40px; border-radius: var(--radius-md); background: var(--foil-gold);
+          box-shadow: var(--bevel-gold), var(--shadow-2); display:flex; align-items:center; justify-content:center;
+          font-family: var(--font-display); letter-spacing:.28em; text-transform:uppercase; font-size:13px;
+          color: var(--espresso-900); }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw dark"  style="background:var(--gold-800)"><b>gold-800</b><span>#7c6230</span></div>
+    <div class="sw dark"  style="background:var(--gold-700)"><b>gold-700</b><span>#997844</span></div>
+    <div class="sw dark"  style="background:var(--gold-600)"><b>gold-600</b><span>#b5935a</span></div>
+    <div class="sw light" style="background:var(--gold-500)"><b>gold-500</b><span>#c9a86a</span></div>
+    <div class="sw light" style="background:var(--gold-400)"><b>gold-400</b><span>#dabf86</span></div>
+    <div class="sw light" style="background:var(--gold-300)"><b>gold-300</b><span>#e8d4a8</span></div>
+    <div class="sw light" style="background:var(--gold-200)"><b>gold-200</b><span>#f2e6cb</span></div>
+  </div>
+  <div class="foil">Champagne&nbsp;Foil</div>
+</body>
+</html>

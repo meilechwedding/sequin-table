@@ -1,0 +1,73 @@
+/* ============================================================
+   SEQUIN — Base element styles & resets (token-driven)
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--type-body-size);
+  font-weight: var(--fw-regular);
+  line-height: var(--type-body-lh);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection { background: var(--selection-bg); color: var(--text); }
+
+/* Headings default to the display serif (Playfair) */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  letter-spacing: var(--track-normal);
+  line-height: var(--lh-tight);
+  color: var(--text);
+  margin: 0 0 0.4em;
+  text-wrap: balance;
+}
+
+p { margin: 0 0 1em; text-wrap: pretty; }
+
+a { color: var(--accent-text); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 0.18em; }
+
+small { font-size: var(--text-sm); }
+
+hr {
+  border: 0;
+  height: 1px;
+  background: var(--border);
+  margin: var(--space-6) 0;
+}
+
+img { max-width: 100%; display: block; }
+
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+  border-radius: var(--radius-xs);
+}
+
+/* ---------- Reusable type helpers ---------- */
+.eyebrow {
+  font-family: var(--font-ui);
+  font-size: var(--type-eyebrow-size);
+  font-weight: var(--type-eyebrow-weight);
+  letter-spacing: var(--type-eyebrow-track);
+  text-transform: uppercase;
+  color: var(--accent-text);
+}
+.display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-regular);
+  letter-spacing: var(--track-normal);
+  line-height: var(--lh-tight);
+}
+.serif {
+  font-family: var(--font-serif);
+}
+.muted { color: var(--text-muted); }
