@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft,
   ArrowRight,
   Check,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Heart,
   Instagram,
   Mail,
@@ -65,12 +66,37 @@ function App() {
   const [saved, setSaved] = useState<string[]>([]);
   const [toast, setToast] = useState("");
 
+  const rotateHero = (direction: "next" | "prev") => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setActiveHero((current) =>
+      direction === "next" ? (current + 1) % heroItems.length : (current + heroItems.length - 1) % heroItems.length,
+    );
+    window.setTimeout(() => setIsAnimating(false), 700);
+  };
+
+  const showHero = (index: number) => {
+    if (index === activeHero || isAnimating) return;
+    setIsAnimating(true);
+    setActiveHero(index);
+    window.setTimeout(() => setIsAnimating(false), 700);
+  };
+
   useEffect(() => {
     heroItems.forEach((item) => {
       const image = new Image();
-      image.src = item.image;
+      image.src = item.heroImage ?? item.image;
     });
   }, []);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setIsAnimating(true);
+      setActiveHero((current) => (current + 1) % heroItems.length);
+      window.setTimeout(() => setIsAnimating(false), 700);
+    }, 6200);
+    return () => window.clearTimeout(timeout);
+  }, [activeHero]);
 
   useEffect(() => {
     const onHash = () => setView(getInitialView());
@@ -90,15 +116,6 @@ function App() {
     setActiveFilter("All");
     window.history.replaceState(null, "", `#${nextView}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const rotateHero = (direction: "next" | "prev") => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setActiveHero((current) =>
-      direction === "next" ? (current + 1) % heroItems.length : (current + heroItems.length - 1) % heroItems.length,
-    );
-    window.setTimeout(() => setIsAnimating(false), 650);
   };
 
   const addToCart = (product: Product) => {
@@ -145,9 +162,6 @@ function App() {
   }, [activeFilter, query, sort, view]);
 
   const currentHero = heroItems[activeHero];
-  const previousHero = heroItems[(activeHero + heroItems.length - 1) % heroItems.length];
-  const nextHero = heroItems[(activeHero + 1) % heroItems.length];
-  const backHero = heroItems[(activeHero + 2) % heroItems.length];
 
   return (
     <div className="site-shell">
@@ -165,12 +179,10 @@ function App() {
         <main>
           <Hero
             current={currentHero}
-            previous={previousHero}
-            next={nextHero}
-            back={backHero}
             activeHero={activeHero}
             onPrev={() => rotateHero("prev")}
             onNext={() => rotateHero("next")}
+            onShowHero={showHero}
             onNavigate={navigate}
             onOpenProduct={setSelectedProduct}
           />
@@ -296,31 +308,22 @@ function Header({
 
 function Hero({
   current,
-  previous,
-  next,
-  back,
   activeHero,
   onPrev,
   onNext,
+  onShowHero,
   onNavigate,
   onOpenProduct,
 }: {
   current: Product;
-  previous: Product;
-  next: Product;
-  back: Product;
   activeHero: number;
   onPrev: () => void;
   onNext: () => void;
+  onShowHero: (index: number) => void;
   onNavigate: (view: View) => void;
   onOpenProduct: (product: Product) => void;
 }) {
-  const stageItems = [
-    { product: current, role: "center" },
-    { product: previous, role: "left" },
-    { product: next, role: "right" },
-    { product: back, role: "back" },
-  ];
+  const heroImage = current.heroImage ?? current.image;
 
   return (
     <section className="hero-frame" aria-label="Sequin Table featured linens">
@@ -350,39 +353,40 @@ function Hero({
       <div className="hero-stage" style={{ backgroundColor: current.palette }}>
         <div className="grain-layer" />
         <span className="hero-brand">SEQUIN</span>
-        <strong className="ghost-word">LINEN</strong>
+        <strong className="ghost-word">TABLE</strong>
 
-        <div className="hero-orbit" aria-hidden="true">
-          {stageItems.map(({ product, role }) => (
-            <button
-              key={`${product.id}-${role}`}
-              className={`hero-product hero-product-${role}`}
-              type="button"
-              onClick={() => onOpenProduct(product)}
-              tabIndex={role === "center" ? 0 : -1}
-            >
-              <img src={product.image} alt="" draggable={false} />
-            </button>
-          ))}
-        </div>
+        <div className="hero-rim" aria-hidden="true" />
+        <button className="hero-table-display" type="button" onClick={() => onOpenProduct(current)}>
+          <span className="hero-table-shadow" />
+          <img key={current.id} src={heroImage} alt={`${current.title} styled on a table`} draggable={false} />
+        </button>
 
         <div className="hero-stage-copy">
           <p>{current.title}</p>
           <span>{current.description}</span>
-          <div className="hero-arrows">
-        <button type="button" onClick={onPrev} aria-label="Previous featured linen">
-              <ArrowLeft size={24} />
-            </button>
-            <button type="button" onClick={onNext} aria-label="Next featured linen" data-testid="hero-next">
-              <ArrowRight size={24} />
-            </button>
+          <div className="hero-meta-row">
+            <small>{current.category}</small>
+            <small>{formatPrice(current)}</small>
           </div>
         </div>
 
+        <div className="hero-arrows">
+          <button type="button" onClick={onPrev} aria-label="Previous featured linen">
+            <ChevronLeft size={28} />
+          </button>
+          <button type="button" onClick={onNext} aria-label="Next featured linen" data-testid="hero-next">
+            <ChevronRight size={28} />
+          </button>
+        </div>
+
         <button className="discover-link" type="button" onClick={() => onOpenProduct(current)}>
-          Discover It
-          <ArrowRight size={26} />
+          Explore this linen
+          <ArrowRight size={22} />
         </button>
+
+        <div className="hero-progress" aria-hidden="true">
+          <span key={current.id} />
+        </div>
 
         <div className="hero-dots" aria-label="Featured slide">
           {heroItems.map((item, index) => (
@@ -390,7 +394,7 @@ function Hero({
               key={item.id}
               className={index === activeHero ? "active" : ""}
               type="button"
-              onClick={index > activeHero ? onNext : onPrev}
+              onClick={() => onShowHero(index)}
               aria-label={`Show ${item.title}`}
             />
           ))}
