@@ -85,7 +85,7 @@ function App() {
   useEffect(() => {
     heroItems.forEach((item) => {
       const image = new Image();
-      image.src = item.heroImage ?? item.image;
+      image.src = item.image;
     });
   }, []);
 
@@ -323,8 +323,6 @@ function Hero({
   onNavigate: (view: View) => void;
   onOpenProduct: (product: Product) => void;
 }) {
-  const heroImage = current.heroImage ?? current.image;
-
   return (
     <section className="hero-frame" aria-label="Sequin Table featured linens">
       <aside className="hero-copy-panel">
@@ -351,17 +349,16 @@ function Hero({
       </aside>
 
       <div className="hero-stage" style={{ backgroundColor: current.palette }}>
+        <button className="hero-photo-button" type="button" onClick={() => onOpenProduct(current)}>
+          <img key={current.id} src={current.image} alt={`${current.title} styled table linen`} draggable={false} />
+        </button>
+        <div className="hero-photo-wash" aria-hidden="true" />
         <div className="grain-layer" />
         <span className="hero-brand">SEQUIN</span>
-        <strong className="ghost-word">TABLE</strong>
-
-        <div className="hero-rim" aria-hidden="true" />
-        <button className="hero-table-display" type="button" onClick={() => onOpenProduct(current)}>
-          <span className="hero-table-shadow" />
-          <img key={current.id} src={heroImage} alt={`${current.title} styled on a table`} draggable={false} />
-        </button>
+        <strong className="ghost-word">LINEN</strong>
 
         <div className="hero-stage-copy">
+          <span className="hero-overline">{current.collection}</span>
           <p>{current.title}</p>
           <span>{current.description}</span>
           <div className="hero-meta-row">
@@ -380,7 +377,7 @@ function Hero({
         </div>
 
         <button className="discover-link" type="button" onClick={() => onOpenProduct(current)}>
-          Explore this linen
+          View Details
           <ArrowRight size={22} />
         </button>
 

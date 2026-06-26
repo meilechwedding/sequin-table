@@ -17,7 +17,6 @@ export type Product = {
   category: ProductCategory;
   price: number;
   image: string;
-  heroImage?: string;
   description: string;
   variants: string[];
   tags: string[];
@@ -34,7 +33,6 @@ export const products: Product[] = [
     category: "Overlays",
     price: 168,
     image: "/products/the-flutter-overlay.jpg",
-    heroImage: "/hero/flutter-overlay.png",
     palette: "#c89962",
     featured: true,
     tags: ["butterfly", "lace", "white", "overlay", "event"],
@@ -50,7 +48,6 @@ export const products: Product[] = [
     category: "Velvet",
     price: 170,
     image: "/products/lisbon-ribbed.jpg",
-    heroImage: "/hero/lisbon-ribbed-cream.png",
     palette: "#d7c4a5",
     featured: true,
     tags: ["cream", "ribbed", "velvet", "neutral", "machine washable"],
@@ -66,7 +63,6 @@ export const products: Product[] = [
     category: "Velvet",
     price: 170,
     image: "/products/lisbon-ribbed-white.jpg",
-    heroImage: "/hero/lisbon-ribbed-white.png",
     palette: "#f3eee6",
     featured: true,
     tags: ["white", "ribbed", "velvet", "fresh", "wedding"],
@@ -82,7 +78,6 @@ export const products: Product[] = [
     category: "Quilted",
     price: 170,
     image: "/products/willow-quilted.jpg",
-    heroImage: "/hero/willow-quilted.png",
     palette: "#9fa482",
     featured: true,
     tags: ["quilted", "taupe stitch", "velvet", "washable", "soft"],
@@ -224,7 +219,6 @@ export const products: Product[] = [
     category: "Overlays",
     price: 0,
     image: "/products/dolce-flutter-overlay.jpg",
-    heroImage: "/hero/dolce-flutter-overlay.png",
     palette: "#c79a70",
     featured: true,
     tags: ["rental", "butterfly", "lace", "overlay", "white"],
