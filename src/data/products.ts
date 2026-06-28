@@ -21,6 +21,9 @@ export type Product = {
   variants: string[];
   tags: string[];
   palette: string;
+  heroAsset?: string;
+  heroBg?: string;
+  heroPanel?: string;
   featured?: boolean;
 };
 
@@ -34,6 +37,9 @@ export const products: Product[] = [
     price: 168,
     image: "/products/the-flutter-overlay.jpg",
     palette: "#c89962",
+    heroAsset: "/hero3d/flutter-overlay.png",
+    heroBg: "#b98563",
+    heroPanel: "#d9b18f",
     featured: true,
     tags: ["butterfly", "lace", "white", "overlay", "event"],
     variants: ["54x72", "60x84", "60x96", "72x108", "72x120", "72x144", "72x180", "72x204"],
@@ -64,6 +70,9 @@ export const products: Product[] = [
     price: 170,
     image: "/products/lisbon-ribbed-white.jpg",
     palette: "#f3eee6",
+    heroAsset: "/hero3d/lisbon-ribbed-white.png",
+    heroBg: "#b9c4bd",
+    heroPanel: "#dce4dd",
     featured: true,
     tags: ["white", "ribbed", "velvet", "fresh", "wedding"],
     variants: ["54x72", "60x90", "72x108", "72x120", "72x132", "72x144", "72x180", "72x204"],
@@ -79,6 +88,9 @@ export const products: Product[] = [
     price: 170,
     image: "/products/willow-quilted.jpg",
     palette: "#9fa482",
+    heroAsset: "/hero3d/willow-quilted.png",
+    heroBg: "#8f9875",
+    heroPanel: "#b6bd9f",
     featured: true,
     tags: ["quilted", "taupe stitch", "velvet", "washable", "soft"],
     variants: ["54x72", "60x90", "72x108", "72x120", "72x132", "72x144", "72x180", "72x204", "72x220"],
@@ -108,6 +120,10 @@ export const products: Product[] = [
     price: 168,
     image: "/products/doria-eyelet-tablecloth.jpg",
     palette: "#f4ede4",
+    heroAsset: "/hero3d/doria-eyelet.png",
+    heroBg: "#7c3345",
+    heroPanel: "#b36a78",
+    featured: true,
     tags: ["eyelet", "white", "modern", "lace", "liner"],
     variants: ["54x72", "60x84", "60x96", "72x108", "72x120", "72x132", "72x144", "72x180", "72x204"],
     description:
@@ -534,6 +550,8 @@ export const categories: ProductCategory[] = [
 ];
 
 export const featuredProducts = products.filter((product) => product.featured);
+
+export const heroProducts = products.filter((product) => product.heroAsset);
 
 export const productUrl = (product: Product) => `https://sequintable.com/products/${product.handle}`;
 

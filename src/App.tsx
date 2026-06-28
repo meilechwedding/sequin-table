@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  ArrowLeft,
   ArrowRight,
+  Calendar,
   Check,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   Heart,
   Instagram,
   Mail,
@@ -22,34 +22,33 @@ import {
   categories,
   featuredProducts,
   formatPrice,
+  heroProducts,
   Product,
   ProductCategory,
   products,
   productUrl,
 } from "./data/products";
 
-type View = "home" | "shop" | "rentals" | "about";
+type View = "home" | "shop" | "rentals" | "gallery" | "contact" | "cart";
 type SortKey = "featured" | "price-asc" | "price-desc" | "az";
-type CartItem = { product: Product; qty: number };
+type CartItem = { product: Product; qty: number; variant: string; date?: string };
 
 const views: Array<{ id: View; label: string }> = [
   { id: "home", label: "Home" },
   { id: "shop", label: "Shop" },
   { id: "rentals", label: "Rentals" },
-  { id: "about", label: "About" },
+  { id: "gallery", label: "Gallery" },
+  { id: "contact", label: "Contact" },
 ];
 
-const heroItems = featuredProducts.slice(0, 5);
-
 const filterOptions: Array<"All" | ProductCategory> = ["All", ...categories];
-
 const contactPhone = "718-790-1832";
 const whatsappNumber = "17187901832";
 const contactEmail = "sequintable@gmail.com";
 
 const getInitialView = (): View => {
   const hash = window.location.hash.replace("#", "");
-  return views.some((item) => item.id === hash) ? (hash as View) : "home";
+  return ["home", "shop", "rentals", "gallery", "contact", "cart"].includes(hash) ? (hash as View) : "home";
 };
 
 function App() {
@@ -57,44 +56,80 @@ function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeHero, setActiveHero] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<"All" | ProductCategory>("All");
   const [sort, setSort] = useState<SortKey>("featured");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [saved, setSaved] = useState<string[]>([]);
   const [toast, setToast] = useState("");
 
-  const rotateHero = (direction: "next" | "prev") => {
+  const navigate = (nextView: View) => {
+    setView(nextView);
+    setSelectedProduct(null);
+    setMobileOpen(false);
+    setActiveFilter("All");
+    window.history.replaceState(null, "", `#${nextView}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const navigateHero = (direction: "next" | "prev") => {
     if (isAnimating) return;
     setIsAnimating(true);
     setActiveHero((current) =>
-      direction === "next" ? (current + 1) % heroItems.length : (current + heroItems.length - 1) % heroItems.length,
+      direction === "next"
+        ? (current + 1) % heroProducts.length
+        : (current + heroProducts.length - 1) % heroProducts.length,
     );
-    window.setTimeout(() => setIsAnimating(false), 700);
+    window.setTimeout(() => setIsAnimating(false), 650);
   };
 
-  const showHero = (index: number) => {
-    if (index === activeHero || isAnimating) return;
-    setIsAnimating(true);
-    setActiveHero(index);
-    window.setTimeout(() => setIsAnimating(false), 700);
+  const addToCart = (product: Product, variant = product.variants[0] ?? "Default", qty = 1, date?: string) => {
+    setCart((current) => {
+      const existing = current.find(
+        (item) => item.product.id === product.id && item.variant === variant && item.date === date,
+      );
+      if (existing) {
+        return current.map((item) =>
+          item === existing ? { ...item, qty: item.qty + qty } : item,
+        );
+      }
+      return [...current, { product, qty, variant, date }];
+    });
+    setToast(product.price > 0 ? "Added to cart" : "Added to rental quote");
+  };
+
+  const updateQty = (index: number, delta: number) => {
+    setCart((current) =>
+      current
+        .map((item, itemIndex) => (itemIndex === index ? { ...item, qty: Math.max(0, item.qty + delta) } : item))
+        .filter((item) => item.qty > 0),
+    );
+  };
+
+  const toggleSaved = (productId: string) => {
+    setSaved((current) =>
+      current.includes(productId) ? current.filter((id) => id !== productId) : [...current, productId],
+    );
   };
 
   useEffect(() => {
-    heroItems.forEach((item) => {
+    heroProducts.forEach((item) => {
       const image = new Image();
-      image.src = item.image;
+      image.src = item.heroAsset ?? item.image;
     });
   }, []);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => {
-      setIsAnimating(true);
-      setActiveHero((current) => (current + 1) % heroItems.length);
-      window.setTimeout(() => setIsAnimating(false), 700);
-    }, 6200);
+    const onResize = () => setIsMobile(window.innerWidth < 640);
+    onResize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => navigateHero("next"), 5900);
     return () => window.clearTimeout(timeout);
   }, [activeHero]);
 
@@ -109,40 +144,6 @@ function App() {
     const timeout = window.setTimeout(() => setToast(""), 2200);
     return () => window.clearTimeout(timeout);
   }, [toast]);
-
-  const navigate = (nextView: View) => {
-    setView(nextView);
-    setMobileOpen(false);
-    setActiveFilter("All");
-    window.history.replaceState(null, "", `#${nextView}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const addToCart = (product: Product) => {
-    setCart((current) => {
-      const existing = current.find((item) => item.product.id === product.id);
-      if (existing) {
-        return current.map((item) => (item.product.id === product.id ? { ...item, qty: item.qty + 1 } : item));
-      }
-      return [...current, { product, qty: 1 }];
-    });
-    setDrawerOpen(true);
-    setToast(product.price > 0 ? "Added to bag" : "Added to quote");
-  };
-
-  const updateQty = (productId: string, delta: number) => {
-    setCart((current) =>
-      current
-        .map((item) => (item.product.id === productId ? { ...item, qty: Math.max(0, item.qty + delta) } : item))
-        .filter((item) => item.qty > 0),
-    );
-  };
-
-  const toggleSaved = (productId: string) => {
-    setSaved((current) =>
-      current.includes(productId) ? current.filter((id) => id !== productId) : [...current, productId],
-    );
-  };
 
   const catalogProducts = useMemo(() => {
     const base = view === "rentals" ? products.filter((product) => product.collection === "Rentals") : products;
@@ -161,8 +162,6 @@ function App() {
     });
   }, [activeFilter, query, sort, view]);
 
-  const currentHero = heroItems[activeHero];
-
   return (
     <div className="site-shell">
       <Header
@@ -172,17 +171,15 @@ function App() {
         savedCount={saved.length}
         onNavigate={navigate}
         onMenu={() => setMobileOpen((open) => !open)}
-        onOpenCart={() => setDrawerOpen(true)}
       />
 
-      {view === "home" && (
+      {view === "home" && !selectedProduct && (
         <main>
           <Hero
-            current={currentHero}
             activeHero={activeHero}
-            onPrev={() => rotateHero("prev")}
-            onNext={() => rotateHero("next")}
-            onShowHero={showHero}
+            isMobile={isMobile}
+            onPrev={() => navigateHero("prev")}
+            onNext={() => navigateHero("next")}
             onNavigate={navigate}
             onOpenProduct={setSelectedProduct}
           />
@@ -196,7 +193,7 @@ function App() {
         </main>
       )}
 
-      {(view === "shop" || view === "rentals") && (
+      {(view === "shop" || view === "rentals") && !selectedProduct && (
         <CatalogView
           view={view}
           products={catalogProducts}
@@ -213,22 +210,20 @@ function App() {
         />
       )}
 
-      {view === "about" && <AboutView onNavigate={navigate} />}
+      {view === "gallery" && !selectedProduct && <GalleryView onOpenProduct={setSelectedProduct} />}
+      {view === "contact" && !selectedProduct && <ContactView onNavigate={navigate} />}
+      {view === "cart" && !selectedProduct && <CartView cart={cart} onNavigate={navigate} onUpdateQty={updateQty} />}
 
-      <ProductModal
-        product={selectedProduct}
-        saved={saved}
-        onClose={() => setSelectedProduct(null)}
-        onAdd={addToCart}
-        onToggleSaved={toggleSaved}
-      />
-
-      <QuoteDrawer
-        open={drawerOpen}
-        cart={cart}
-        onClose={() => setDrawerOpen(false)}
-        onUpdateQty={updateQty}
-      />
+      {selectedProduct && (
+        <ProductView
+          product={selectedProduct}
+          saved={saved.includes(selectedProduct.id)}
+          onBack={() => setSelectedProduct(null)}
+          onAdd={addToCart}
+          onOpenProduct={setSelectedProduct}
+          onToggleSaved={() => toggleSaved(selectedProduct.id)}
+        />
+      )}
 
       {toast && <div className="toast">{toast}</div>}
     </div>
@@ -242,7 +237,6 @@ function Header({
   savedCount,
   onNavigate,
   onMenu,
-  onOpenCart,
 }: {
   view: View;
   mobileOpen: boolean;
@@ -250,15 +244,14 @@ function Header({
   savedCount: number;
   onNavigate: (view: View) => void;
   onMenu: () => void;
-  onOpenCart: () => void;
 }) {
   return (
     <header className="site-header">
       <a className="brand-lockup" href="#home" onClick={() => onNavigate("home")} aria-label="Sequin Table home">
         <img src="/brand/monogram.svg" alt="" />
         <span>
-          <strong>Sequin</strong>
-          <small>Table Linen Rental and Home</small>
+          <strong>Sequin Table</strong>
+          <small>Rental and home linens</small>
         </span>
       </a>
 
@@ -284,7 +277,7 @@ function Header({
           <Heart size={18} />
           {savedCount > 0 && <span>{savedCount}</span>}
         </button>
-        <button className="bag-button" type="button" onClick={onOpenCart} aria-label={`${cartCount} items in bag`}>
+        <button className="bag-button" type="button" onClick={() => onNavigate("cart")} aria-label={`${cartCount} items in cart`}>
           <ShoppingBag size={18} />
           <span>{cartCount}</span>
         </button>
@@ -295,7 +288,7 @@ function Header({
 
       {mobileOpen && (
         <div className="mobile-nav">
-          {views.map((item) => (
+          {[...views, { id: "cart" as View, label: "Cart" }].map((item) => (
             <button key={item.id} type="button" onClick={() => onNavigate(item.id)}>
               {item.label}
             </button>
@@ -307,98 +300,122 @@ function Header({
 }
 
 function Hero({
-  current,
   activeHero,
+  isMobile,
   onPrev,
   onNext,
-  onShowHero,
   onNavigate,
   onOpenProduct,
 }: {
-  current: Product;
   activeHero: number;
+  isMobile: boolean;
   onPrev: () => void;
   onNext: () => void;
-  onShowHero: (index: number) => void;
   onNavigate: (view: View) => void;
   onOpenProduct: (product: Product) => void;
 }) {
+  const current = heroProducts[activeHero];
+
   return (
-    <section className="hero-frame" aria-label="Sequin Table featured linens">
-      <aside className="hero-copy-panel">
-        <p className="mini-label">Sequin Table</p>
-        <h1>Upscale Table Linen for Events & Home</h1>
-        <p>
-          Bringing sophistication and style to every celebration with curated rentals, home linens,
-          napkins, and finishing details.
-        </p>
-        <div className="hero-stats" aria-label="Sequin highlights">
-          <span>4.1K Instagram followers</span>
-          <span>Nationwide shipping</span>
-          <span>Brooklyn based styling</span>
-        </div>
-        <div className="hero-copy-actions">
-          <button type="button" className="primary-button light" onClick={() => onNavigate("shop")}>
-            Explore Shop
+    <section
+      className="hero-carousel"
+      aria-label="Sequin Table featured tablecloth carousel"
+      style={{ backgroundColor: current.heroBg ?? current.palette }}
+    >
+      <div className="grain-layer" />
+      <div className="hero-ghost">SEQUIN TABLE</div>
+      <span className="hero-brand-tag">SEQUIN TABLE</span>
+
+      <div className="hero-object-stage">
+        {heroProducts.map((product, index) => {
+          const role =
+            index === activeHero
+              ? "center"
+              : index === (activeHero + heroProducts.length - 1) % heroProducts.length
+                ? "left"
+                : index === (activeHero + 1) % heroProducts.length
+                  ? "right"
+                  : "back";
+          return (
+            <button
+              className={`hero-object hero-object-${role}`}
+              key={product.id}
+              type="button"
+              onClick={() => (role === "center" ? onOpenProduct(product) : undefined)}
+              style={getHeroRoleStyle(role, isMobile)}
+              aria-label={role === "center" ? `View ${product.title}` : product.title}
+            >
+              <img src={product.heroAsset ?? product.image} alt={product.title} draggable={false} />
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="hero-text-card">
+        <p>{current.collection}</p>
+        <h1>{current.title}</h1>
+        <span>{current.description}</span>
+        <div>
+          <button type="button" className="round-cta light" onClick={() => onNavigate("shop")}>
+            Shop
             <ArrowRight size={18} />
           </button>
-          <button type="button" className="ghost-button" onClick={() => onNavigate("rentals")}>
-            See Rentals
+          <button type="button" className="round-cta glass" onClick={() => onNavigate("rentals")}>
+            Explore Rentals
+            <Sparkles size={18} />
           </button>
-        </div>
-      </aside>
-
-      <div className="hero-stage" style={{ backgroundColor: current.palette }}>
-        <button className="hero-photo-button" type="button" onClick={() => onOpenProduct(current)}>
-          <img key={current.id} src={current.image} alt={`${current.title} styled table linen`} draggable={false} />
-        </button>
-        <div className="hero-photo-wash" aria-hidden="true" />
-        <div className="grain-layer" />
-        <span className="hero-brand">SEQUIN</span>
-        <strong className="ghost-word">LINEN</strong>
-
-        <div className="hero-stage-copy">
-          <span className="hero-overline">{current.collection}</span>
-          <p>{current.title}</p>
-          <span>{current.description}</span>
-          <div className="hero-meta-row">
-            <small>{current.category}</small>
-            <small>{formatPrice(current)}</small>
-          </div>
-        </div>
-
-        <div className="hero-arrows">
-          <button type="button" onClick={onPrev} aria-label="Previous featured linen">
-            <ChevronLeft size={28} />
-          </button>
-          <button type="button" onClick={onNext} aria-label="Next featured linen" data-testid="hero-next">
-            <ChevronRight size={28} />
-          </button>
-        </div>
-
-        <button className="discover-link" type="button" onClick={() => onOpenProduct(current)}>
-          View Details
-          <ArrowRight size={22} />
-        </button>
-
-        <div className="hero-progress" aria-hidden="true">
-          <span key={current.id} />
-        </div>
-
-        <div className="hero-dots" aria-label="Featured slide">
-          {heroItems.map((item, index) => (
-            <button
-              key={item.id}
-              className={index === activeHero ? "active" : ""}
-              type="button"
-              onClick={() => onShowHero(index)}
-              aria-label={`Show ${item.title}`}
-            />
-          ))}
         </div>
       </div>
+
+      <div className="hero-nav-buttons">
+        <button type="button" onClick={onPrev} aria-label="Previous tablecloth">
+          <ArrowLeft size={25} />
+        </button>
+        <button type="button" onClick={onNext} aria-label="Next tablecloth" data-testid="hero-next">
+          <ArrowRight size={25} />
+        </button>
+      </div>
+
+      <button className="hero-discover" type="button" onClick={() => onOpenProduct(current)}>
+        View Product
+        <ArrowRight size={28} />
+      </button>
     </section>
   );
+}
+
+function getHeroRoleStyle(role: "center" | "left" | "right" | "back", isMobile: boolean) {
+  if (role === "center") {
+    return {
+      left: "50%",
+      bottom: isMobile ? "19%" : "-3%",
+      height: isMobile ? "49%" : "76%",
+      transform: `translateX(-50%) scale(${isMobile ? 1.35 : 1.36})`,
+      opacity: 1,
+      filter: "blur(0)",
+      zIndex: 22,
+    };
+  }
+  if (role === "left" || role === "right") {
+    return {
+      left: role === "left" ? (isMobile ? "18%" : "27%") : isMobile ? "82%" : "73%",
+      bottom: isMobile ? "42%" : "14%",
+      height: isMobile ? "18%" : "28%",
+      transform: "translateX(-50%) scale(1)",
+      opacity: 0.82,
+      filter: "blur(1.5px)",
+      zIndex: 10,
+    };
+  }
+  return {
+    left: "50%",
+    bottom: isMobile ? "43%" : "16%",
+    height: isMobile ? "14%" : "22%",
+    transform: "translateX(-50%) scale(1)",
+    opacity: 0.55,
+    filter: "blur(3px)",
+    zIndex: 5,
+  };
 }
 
 function HomeContent({
@@ -414,39 +431,36 @@ function HomeContent({
   onToggleSaved: (productId: string) => void;
   saved: string[];
 }) {
-  const previewProducts = products.filter((product) => product.featured).slice(0, 6);
-  const rentalPreview = products.filter((product) => product.collection === "Rentals").slice(13, 16);
+  const previewProducts = featuredProducts.slice(0, 8);
+  const rentalPreview = products.filter((product) => product.collection === "Rentals").slice(0, 4);
 
   return (
     <>
-      <section className="collection-lanes" aria-label="Sequin collections">
-        <button className="lane lane-rental" type="button" onClick={() => onNavigate("rentals")}>
-          <img src="/products/dolce-flutter-overlay.jpg" alt="" />
-          <span>Event Linen Rentals</span>
-          <strong>Explore Rentals</strong>
-        </button>
-        <button className="lane lane-home" type="button" onClick={() => onNavigate("shop")}>
+      <section className="split-paths" aria-label="Shop and rental paths">
+        <button className="path-card path-shop" type="button" onClick={() => onNavigate("shop")}>
           <img src="/products/lisbon-ribbed-white.jpg" alt="" />
-          <span>Home Table Linen</span>
-          <strong>Shop Now</strong>
+          <span>Home Table Linens</span>
+          <strong>Shop sizes, colors, and textures for your table.</strong>
+          <ArrowRight size={22} />
         </button>
-        <button className="lane lane-detail" type="button" onClick={() => onNavigate("shop")}>
-          <img src="/products/bee-napkin-ring.png" alt="" />
-          <span>Napkins & Rings</span>
-          <strong>Finish the Table</strong>
+        <button className="path-card path-rentals" type="button" onClick={() => onNavigate("rentals")}>
+          <img src="/products/dolce-flutter-overlay.jpg" alt="" />
+          <span>Event Rentals</span>
+          <strong>Build a quote for overlays, cloths, napkins, and rings.</strong>
+          <ArrowRight size={22} />
         </button>
       </section>
 
       <section className="section-block">
         <div className="section-heading">
           <p className="mini-label">Current favorites</p>
-          <h2>Textured pieces that make the table feel designed.</h2>
+          <h2>Clean whites, soft velvets, lace overlays, and finished event textures.</h2>
           <button type="button" className="text-button" onClick={() => onNavigate("shop")}>
-            View full catalog
+            View full shop
             <ArrowRight size={18} />
           </button>
         </div>
-        <div className="product-grid compact-grid">
+        <div className="product-grid">
           {previewProducts.map((product) => (
             <ProductCard
               key={product.id}
@@ -462,14 +476,14 @@ function HomeContent({
 
       <section className="editorial-band">
         <div>
-          <p className="mini-label">Rental styling</p>
-          <h2>Layer lace, velvet, napkins, and rings into one finished table.</h2>
+          <p className="mini-label">For planners and hosts</p>
+          <h2>One brand for buying a tablecloth and renting a full table story.</h2>
           <p>
-            Sequin's rental catalog is built for hosts and planners who want a polished setting without
-            owning every piece.
+            Sequin Table keeps the product experience simple: shop home pieces with prices, or request
+            event availability without showing rental pricing online.
           </p>
           <button type="button" className="primary-button dark" onClick={() => onNavigate("rentals")}>
-            Build a Rental Quote
+            Explore Rental Quote
             <ArrowRight size={18} />
           </button>
         </div>
@@ -485,9 +499,9 @@ function HomeContent({
 
       <section className="process-strip">
         {[
-          ["Choose", "Browse home linens, rentals, napkins, and finishing pieces by texture, color, or occasion."],
-          ["Confirm", "Open a product on Shopify or request availability for event rentals."],
-          ["Host", "Set a table with the right scale, fabric, and layered detail for the moment."],
+          ["Shop", "Choose a tablecloth size, quantity, and color direction for your home table."],
+          ["Quote", "Select rental pieces, date, size, and quantity, then send an inquiry to Sequin."],
+          ["Style", "Layer lace, velvet, napkins, and rings into a polished finished setting."],
         ].map(([title, copy]) => (
           <div key={title}>
             <Check size={18} />
@@ -533,12 +547,12 @@ function CatalogView({
     <main className="catalog-page">
       <section className="catalog-hero">
         <div>
-          <p className="mini-label">{isRental ? "Party rentals" : "Shop"}</p>
-          <h1>{isRental ? "Event Linen Rentals" : "Shop Home Linens"}</h1>
+          <p className="mini-label">{isRental ? "Rentals" : "Shop"}</p>
+          <h1>{isRental ? "Event Linen Rentals" : "Shop Table Linens"}</h1>
           <p>
             {isRental
-              ? "Search event linens by texture, color, and category, then build an availability quote."
-              : "Browse the Sequin home collection with real pricing, sizing, and direct product links."}
+              ? "No rental prices are shown online. Select size, quantity, and event date, then send an availability request."
+              : "A visual Shopify storefront for tablecloths, overlays, napkins, and finishing pieces."}
           </p>
         </div>
         <img src={isRental ? "/products/white-pendant-lace.jpg" : "/products/lisbon-ribbed.jpg"} alt="" />
@@ -551,7 +565,7 @@ function CatalogView({
             data-testid="catalog-search"
             value={query}
             onChange={(event) => onQuery(event.target.value)}
-            placeholder="Search velvet, lace, napkins, white..."
+            placeholder="Search white, velvet, lace, napkin..."
           />
         </label>
         <label className="select-wrap">
@@ -593,14 +607,6 @@ function CatalogView({
           />
         ))}
       </section>
-
-      {products.length === 0 && (
-        <section className="empty-state">
-          <Search size={26} />
-          <h2>No pieces found</h2>
-          <p>Try a different texture, color, or category.</p>
-        </section>
-      )}
     </main>
   );
 }
@@ -643,17 +649,143 @@ function ProductCard({
   );
 }
 
-function AboutView({ onNavigate }: { onNavigate: (view: View) => void }) {
+function ProductView({
+  product,
+  saved,
+  onBack,
+  onAdd,
+  onOpenProduct,
+  onToggleSaved,
+}: {
+  product: Product;
+  saved: boolean;
+  onBack: () => void;
+  onAdd: (product: Product, variant: string, qty: number, date?: string) => void;
+  onOpenProduct: (product: Product) => void;
+  onToggleSaved: () => void;
+}) {
+  const [variant, setVariant] = useState(product.variants[0] ?? "Default");
+  const [qty, setQty] = useState(1);
+  const [date, setDate] = useState("");
+  const isRental = product.collection === "Rentals";
+  const related = products
+    .filter((item) => item.id !== product.id && item.category === product.category)
+    .slice(0, 4);
+
   return (
-    <main className="about-page">
-      <section className="about-hero">
-        <img src="/brand/sequintable-og.jpg" alt="A Sequin Table linen tablescape" />
+    <main className="product-page">
+      <button className="back-button" type="button" onClick={onBack}>
+        <ArrowLeft size={18} />
+        Back
+      </button>
+      <section className="product-detail">
+        <div className="product-gallery">
+          <img src={product.image} alt={product.title} />
+          <div>
+            {[product.image, product.heroAsset ?? product.image, ...related.slice(0, 2).map((item) => item.image)].map((image, index) => (
+              <img key={`${image}-${index}`} src={image} alt="" />
+            ))}
+          </div>
+        </div>
+        <div className="product-info">
+          <p className="mini-label">{product.collection} / {product.category}</p>
+          <h1>{product.title}</h1>
+          <p>{product.description}</p>
+          <strong>{formatPrice(product)}</strong>
+
+          <label className="form-field">
+            <span>Size</span>
+            <select value={variant} onChange={(event) => setVariant(event.target.value)}>
+              {product.variants.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="form-field">
+            <span>Quantity</span>
+            <input type="number" min={1} value={qty} onChange={(event) => setQty(Math.max(1, Number(event.target.value)))} />
+          </label>
+
+          {isRental && (
+            <label className="form-field">
+              <span>Event Date</span>
+              <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
+            </label>
+          )}
+
+          <div className="product-actions">
+            <button type="button" className="primary-button dark" onClick={() => onAdd(product, variant, qty, date)}>
+              {isRental ? "Add to Quote" : "Add to Cart"}
+              <ShoppingBag size={18} />
+            </button>
+            <a className="ghost-link" href={productUrl(product)} target="_blank" rel="noreferrer">
+              Shopify Link
+              <ArrowRight size={18} />
+            </a>
+            <button className={saved ? "save-inline saved" : "save-inline"} type="button" onClick={onToggleSaved}>
+              <Heart size={18} fill={saved ? "currentColor" : "none"} />
+              Save
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-block">
+        <div className="section-heading">
+          <p className="mini-label">Related pieces</p>
+          <h2>More in this texture story.</h2>
+        </div>
+        <div className="product-grid related-grid">
+          {related.map((item) => (
+            <ProductCard
+              key={item.id}
+              product={item}
+              saved={false}
+              onOpen={() => onOpenProduct(item)}
+              onAdd={() => onAdd(item, item.variants[0] ?? "Default", 1)}
+              onToggleSaved={() => undefined}
+            />
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function GalleryView({ onOpenProduct }: { onOpenProduct: (product: Product) => void }) {
+  const gallery = products.filter((product) => product.category !== "Napkin Rings").slice(0, 12);
+  return (
+    <main className="gallery-page">
+      <section className="page-heading">
+        <p className="mini-label">Gallery</p>
+        <h1>Texture, color, and tablecloth details.</h1>
+        <p>Not an Instagram feed, just a clean visual library of Sequin product surfaces.</p>
+      </section>
+      <section className="gallery-grid">
+        {gallery.map((product, index) => (
+          <button key={product.id} className={index % 5 === 0 ? "wide" : ""} type="button" onClick={() => onOpenProduct(product)}>
+            <img src={product.image} alt={product.title} />
+            <span>{product.title}</span>
+          </button>
+        ))}
+      </section>
+    </main>
+  );
+}
+
+function ContactView({ onNavigate }: { onNavigate: (view: View) => void }) {
+  return (
+    <main className="contact-page">
+      <section className="contact-hero">
         <div>
-          <p className="mini-label">About Sequin</p>
-          <h1>Upscale linens for celebrations that feel considered.</h1>
+          <p className="mini-label">Contact Sequin</p>
+          <h1>Tell us what kind of table you are building.</h1>
           <p>
-            Sequin Table Linen Rental and Home brings polished tablecloths, overlays, napkins, and
-            finishing accessories to events and home gatherings.
+            For rentals, send the product list, date, quantities, and event notes. For shopping, this page
+            keeps the visual flow ready for Shopify upload.
           </p>
           <div className="contact-grid">
             <a href={`tel:${contactPhone.replaceAll("-", "")}`}>
@@ -669,171 +801,89 @@ function AboutView({ onNavigate }: { onNavigate: (view: View) => void }) {
               @sequin.table
             </a>
           </div>
-          <button type="button" className="primary-button dark" onClick={() => onNavigate("shop")}>
-            Explore the Collection
+          <button type="button" className="primary-button dark" onClick={() => onNavigate("rentals")}>
+            Start Rental Quote
             <ArrowRight size={18} />
           </button>
         </div>
-      </section>
-
-      <section className="about-values">
-        <div>
-          <Sparkles size={22} />
-          <h2>Texture First</h2>
-          <p>Ribbed velvets, eyelets, lace overlays, boucle, quilted cloths, and embroidered toppers.</p>
-        </div>
-        <div>
-          <ShoppingBag size={22} />
-          <h2>Rental and Home</h2>
-          <p>Event pieces for planners and hosts, plus home linens with sizing and pricing.</p>
-        </div>
-        <div>
-          <Heart size={22} />
-          <h2>Warm Luxury</h2>
-          <p>Champagne gold, soft whites, sage, taupe, blush, espresso, and elevated details.</p>
-        </div>
+        <img src="/brand/sequintable-og.jpg" alt="Sequin Table linen styling" />
       </section>
     </main>
   );
 }
 
-function ProductModal({
-  product,
-  saved,
-  onClose,
-  onAdd,
-  onToggleSaved,
-}: {
-  product: Product | null;
-  saved: string[];
-  onClose: () => void;
-  onAdd: (product: Product) => void;
-  onToggleSaved: (productId: string) => void;
-}) {
-  if (!product) return null;
-  const isSaved = saved.includes(product.id);
-
-  return (
-    <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="product-title">
-      <article className="product-modal">
-        <button className="close-button" type="button" onClick={onClose} aria-label="Close product">
-          <X size={22} />
-        </button>
-        <div className="modal-image">
-          <img src={product.image} alt={product.title} />
-        </div>
-        <div className="modal-copy">
-          <span className="mini-label">{product.collection} / {product.category}</span>
-          <h2 id="product-title">{product.title}</h2>
-          <p>{product.description}</p>
-          <strong>{formatPrice(product)}</strong>
-          <div className="variant-row">
-            {product.variants.slice(0, 8).map((variant) => (
-              <span key={variant}>{variant}</span>
-            ))}
-          </div>
-          <div className="tag-row">
-            {product.tags.slice(0, 6).map((tag) => (
-              <span key={tag}>{tag}</span>
-            ))}
-          </div>
-          <div className="modal-actions">
-            <button type="button" className="primary-button dark" onClick={() => onAdd(product)}>
-              {product.price > 0 ? "Add to Bag" : "Add to Quote"}
-              <ShoppingBag size={18} />
-            </button>
-            <a className="ghost-link" href={productUrl(product)} target="_blank" rel="noreferrer">
-              Open on Shopify
-              <ArrowRight size={18} />
-            </a>
-            <button className={isSaved ? "save-inline saved" : "save-inline"} type="button" onClick={() => onToggleSaved(product.id)}>
-              <Heart size={18} fill={isSaved ? "currentColor" : "none"} />
-              Save
-            </button>
-          </div>
-        </div>
-      </article>
-    </div>
-  );
-}
-
-function QuoteDrawer({
-  open,
+function CartView({
   cart,
-  onClose,
+  onNavigate,
   onUpdateQty,
 }: {
-  open: boolean;
   cart: CartItem[];
-  onClose: () => void;
-  onUpdateQty: (productId: string, delta: number) => void;
+  onNavigate: (view: View) => void;
+  onUpdateQty: (index: number, delta: number) => void;
 }) {
   const total = cart.reduce((sum, item) => sum + item.product.price * item.qty, 0);
-  const inquiryCount = cart.filter((item) => item.product.price === 0).length;
   const quoteText = encodeURIComponent(
     `Hi Sequin Table, I would like help with these pieces:\n\n${cart
-      .map((item) => `${item.qty} x ${item.product.title} (${item.product.collection})`)
+      .map((item) => `${item.qty} x ${item.product.title} (${item.variant}${item.date ? `, ${item.date}` : ""})`)
       .join("\n")}`,
   );
-  const mailTo = `mailto:${contactEmail}?subject=Sequin Table availability request&body=${quoteText}`;
-  const whatsapp = `https://wa.me/${whatsappNumber}?text=${quoteText}`;
 
   return (
-    <aside className={open ? "quote-drawer open" : "quote-drawer"} aria-hidden={!open} data-testid="quote-drawer">
-      <div className="drawer-header">
-        <div>
-          <span className="mini-label">Sequin Table</span>
-          <h2>Bag & Quote</h2>
-        </div>
-        <button type="button" onClick={onClose} aria-label="Close bag">
-          <X size={22} />
-        </button>
-      </div>
+    <main className="cart-page">
+      <section className="page-heading">
+        <p className="mini-label">Cart</p>
+        <h1>Checkout-style visual cart.</h1>
+        <p>Payment is intentionally not connected yet. This is ready as a Shopify visual prototype.</p>
+      </section>
 
-      <div className="drawer-items">
-        {cart.length === 0 && (
-          <div className="drawer-empty">
-            <ShoppingBag size={28} />
-            <p>Your bag is ready for the table.</p>
-          </div>
-        )}
-
-        {cart.map((item) => (
-          <div className="drawer-item" key={item.product.id}>
-            <img src={item.product.image} alt="" />
-            <div>
-              <strong>{item.product.title}</strong>
-              <span>{formatPrice(item.product)}</span>
+      <section className="cart-layout">
+        <div className="cart-items">
+          {cart.length === 0 && (
+            <div className="drawer-empty">
+              <ShoppingBag size={30} />
+              <p>Your cart is ready for a tablecloth.</p>
+              <button type="button" className="primary-button dark" onClick={() => onNavigate("shop")}>
+                Shop Linens
+              </button>
+            </div>
+          )}
+          {cart.map((item, index) => (
+            <article className="cart-item" key={`${item.product.id}-${item.variant}-${item.date ?? "buy"}`}>
+              <img src={item.product.image} alt="" />
+              <div>
+                <strong>{item.product.title}</strong>
+                <span>{item.variant}</span>
+                {item.date && <span><Calendar size={14} /> {item.date}</span>}
+                <small>{formatPrice(item.product)}</small>
+              </div>
               <div className="qty-row">
-                <button type="button" onClick={() => onUpdateQty(item.product.id, -1)} aria-label="Decrease quantity">
+                <button type="button" onClick={() => onUpdateQty(index, -1)} aria-label="Decrease quantity">
                   <Minus size={14} />
                 </button>
                 <span>{item.qty}</span>
-                <button type="button" onClick={() => onUpdateQty(item.product.id, 1)} aria-label="Increase quantity">
+                <button type="button" onClick={() => onUpdateQty(index, 1)} aria-label="Increase quantity">
                   <Plus size={14} />
                 </button>
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="drawer-footer">
-        <div>
-          <span>Estimated product total</span>
-          <strong>{total > 0 ? `$${total.toFixed(2)}` : "Quote needed"}</strong>
+            </article>
+          ))}
         </div>
-        {inquiryCount > 0 && <p>{inquiryCount} rental or accessory items need availability confirmation.</p>}
-        <a className="primary-button dark" href={mailTo}>
-          Email Request
-          <Mail size={18} />
-        </a>
-        <a className="ghost-link" href={whatsapp} target="_blank" rel="noreferrer">
-          WhatsApp Sequin
-          <ArrowRight size={18} />
-        </a>
-      </div>
-    </aside>
+
+        <aside className="cart-summary">
+          <span>Estimated purchase total</span>
+          <strong>{total > 0 ? `$${total.toFixed(2)}` : "Quote needed"}</strong>
+          <p>Rental items stay as inquiry items and never show pricing online.</p>
+          <a className="primary-button dark" href={`mailto:${contactEmail}?subject=Sequin Table request&body=${quoteText}`}>
+            Email Request
+            <Mail size={18} />
+          </a>
+          <a className="ghost-link" href={`https://wa.me/${whatsappNumber}?text=${quoteText}`} target="_blank" rel="noreferrer">
+            WhatsApp Sequin
+            <ArrowRight size={18} />
+          </a>
+        </aside>
+      </section>
+    </main>
   );
 }
 
