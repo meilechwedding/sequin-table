@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title">
+  <title id="title">Sequin mark</title>
+  <defs>
+    <linearGradient id="sequinGold" x1="24" y1="12" x2="136" y2="148" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0c6"/>
+      <stop offset="0.28" stop-color="#dfbd76"/>
+      <stop offset="0.58" stop-color="#a87738"/>
+      <stop offset="1" stop-color="#f5d792"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#sequinGold)">
+    <path d="M80 18 99 37 80 56 61 37z"/>
+    <path d="M80 61 119 100 80 139 41 100z"/>
+    <path d="M80 44 111 75 80 106 49 75z"/>
+  </g>
+  <path d="M80 61 111 92 80 123 49 92z" fill="#2a160b" opacity=".72"/>
+  <path d="M80 53 103 76 80 99 57 76z" fill="url(#sequinGold)"/>
+</svg>

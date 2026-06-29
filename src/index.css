@@ -35,11 +35,18 @@
   --sage: #8d9874;
   --bordeaux: #6a2635;
   --taupe: #a78873;
+  --coffee: #3a1c0d;
+  --gold-foil: linear-gradient(135deg, #fff0c6 0%, #d9b46d 32%, #9f6a2d 66%, #f6d993 100%);
   --line: rgba(66, 47, 35, 0.16);
   --line-dark: rgba(255, 250, 241, 0.18);
   --shadow: 0 24px 70px rgba(39, 23, 12, 0.15);
   --soft-shadow: 0 16px 44px rgba(39, 23, 12, 0.11);
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --radius-frame: 16px 16px 42px 42px;
+  --radius-card: 12px 12px 32px 32px;
+  --radius-control: 10px 10px 24px 24px;
+  --radius-small: 8px 8px 18px 18px;
 }
 
 * {
@@ -103,7 +110,7 @@ img {
   margin: 12px auto;
   padding: 10px 12px;
   border: 1px solid rgba(255, 250, 241, 0.26);
-  border-radius: 999px;
+  border-radius: var(--radius-frame);
   background: rgba(27, 21, 18, 0.88);
   color: var(--cream);
   box-shadow: var(--soft-shadow);
@@ -119,31 +126,19 @@ img {
   text-decoration: none;
 }
 
-.brand-lockup img {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: var(--cream);
-  padding: 6px;
+.brand-lockup > img:first-child {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-small);
+  background: var(--coffee);
+  padding: 7px;
+  border: 1px solid rgba(215, 175, 99, 0.34);
 }
 
-.brand-lockup span {
-  display: grid;
-  min-width: 0;
-}
-
-.brand-lockup strong {
-  font-family: "Sequin Serif", Georgia, serif;
-  font-size: 1.12rem;
-  line-height: 1;
-}
-
-.brand-lockup small {
-  color: rgba(255, 250, 241, 0.66);
-  font-size: 0.72rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.brand-wordmark {
+  width: 148px;
+  height: auto;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.18));
 }
 
 .desktop-nav {
@@ -153,14 +148,14 @@ img {
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--line-dark);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: rgba(255, 250, 241, 0.06);
 }
 
 .nav-link,
 .mobile-nav button {
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: transparent;
   color: rgba(255, 250, 241, 0.78);
   padding: 9px 14px;
@@ -191,7 +186,7 @@ img {
   width: 40px;
   height: 40px;
   border: 1px solid var(--line-dark);
-  border-radius: 50%;
+  border-radius: var(--radius-small);
   background: rgba(255, 250, 241, 0.08);
   color: var(--cream);
   text-decoration: none;
@@ -207,7 +202,7 @@ img {
   min-width: 20px;
   height: 20px;
   padding: 0 5px;
-  border-radius: 999px;
+  border-radius: var(--radius-small);
   background: var(--champagne);
   color: var(--espresso);
   font-size: 0.72rem;
@@ -227,7 +222,7 @@ img {
   gap: 6px;
   padding: 10px;
   border: 1px solid var(--line-dark);
-  border-radius: 26px;
+  border-radius: var(--radius-frame);
   background: rgba(27, 21, 18, 0.96);
 }
 
@@ -238,11 +233,11 @@ img {
   min-height: 650px;
   margin: 0 auto 58px;
   overflow: hidden;
-  border-radius: 34px;
+  border-radius: var(--radius-frame);
   color: white;
   isolation: isolate;
   box-shadow: 0 34px 110px rgba(32, 19, 11, 0.28);
-  transition: background-color 650ms var(--ease);
+  transition: background 900ms var(--ease-smooth);
 }
 
 .hero-carousel::before {
@@ -251,11 +246,10 @@ img {
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, rgba(255, 250, 241, 0.15) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(255, 250, 241, 0.1) 1px, transparent 1px);
-  background-size: 96px 96px;
-  mask-image: linear-gradient(90deg, black, transparent 74%);
-  opacity: 0.32;
+    radial-gradient(circle at 16% 16%, rgba(255, 240, 198, 0.2), transparent 22rem),
+    radial-gradient(circle at 92% 8%, rgba(42, 22, 11, 0.24), transparent 24rem),
+    linear-gradient(180deg, rgba(255, 250, 241, 0.08), rgba(42, 22, 11, 0.12));
+  opacity: 0.92;
 }
 
 .hero-carousel::after {
@@ -274,7 +268,7 @@ img {
   inset: 0;
   z-index: 50;
   pointer-events: none;
-  opacity: 0.4;
+  opacity: 0.22;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.08'/%3E%3C/svg%3E");
   background-size: 200px 200px;
   mix-blend-mode: overlay;
@@ -282,13 +276,12 @@ img {
 
 .hero-brand-tag {
   position: absolute;
-  top: 26px;
+  top: 24px;
   left: 30px;
   z-index: 60;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.74rem;
-  font-weight: 800;
-  text-transform: uppercase;
+  width: min(220px, 46vw);
+  height: auto;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.18));
 }
 
 .hero-ghost {
@@ -301,11 +294,12 @@ img {
   justify-content: center;
   color: rgba(255, 255, 255, 0.95);
   font-family: Impact, "Arial Black", sans-serif;
-  font-size: clamp(4.5rem, 17vw, 18rem);
+  font-size: clamp(4rem, 10.8vw, 11rem);
   font-weight: 900;
   line-height: 0.9;
   text-align: center;
   text-transform: uppercase;
+  opacity: 0.92;
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
@@ -324,12 +318,11 @@ img {
   background: transparent;
   padding: 0;
   transition:
-    transform 650ms var(--ease),
-    filter 650ms var(--ease),
-    opacity 650ms var(--ease),
-    left 650ms var(--ease),
-    bottom 650ms var(--ease),
-    height 650ms var(--ease);
+    transform 820ms var(--ease-smooth),
+    filter 820ms var(--ease-smooth),
+    left 820ms var(--ease-smooth),
+    bottom 820ms var(--ease-smooth),
+    height 820ms var(--ease-smooth);
   will-change: transform, filter, opacity;
 }
 
@@ -342,7 +335,7 @@ img {
 }
 
 .hero-object-center img {
-  animation: table-in 650ms var(--ease) both;
+  transform: translateZ(0);
 }
 
 .hero-text-card {
@@ -398,14 +391,16 @@ img {
   justify-content: center;
   gap: 8px;
   min-height: 46px;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   padding: 12px 18px;
   font-weight: 850;
   text-decoration: none;
+  box-shadow: 0 14px 34px rgba(27, 21, 18, 0.08);
   transition:
     transform 160ms ease,
     background-color 160ms ease,
-    border-color 160ms ease;
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .round-cta:hover,
@@ -471,7 +466,7 @@ img {
   width: 58px;
   height: 58px;
   border: 2px solid rgba(255, 255, 255, 0.48);
-  border-radius: 50%;
+  border-radius: var(--radius-small);
   background: rgba(255, 250, 241, 0.12);
   color: white;
   backdrop-filter: blur(16px);
@@ -495,18 +490,6 @@ img {
   text-transform: uppercase;
 }
 
-@keyframes table-in {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 .split-paths,
 .section-block,
 .editorial-band,
@@ -518,6 +501,36 @@ img {
 .product-page {
   width: min(1320px, calc(100% - 28px));
   margin-inline: auto;
+}
+
+.brand-strip {
+  display: grid;
+  grid-template-columns: minmax(220px, 340px) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(22px, 5vw, 78px);
+  width: min(1320px, calc(100% - 28px));
+  margin: 0 auto 28px;
+  padding: clamp(22px, 4vw, 42px);
+  border: 1px solid rgba(58, 28, 13, 0.12);
+  border-radius: var(--radius-frame);
+  background:
+    linear-gradient(135deg, rgba(255, 250, 241, 0.92), rgba(247, 240, 230, 0.78)),
+    url("/brand/sequin-pattern.svg");
+  background-size: auto, 180px 180px;
+  box-shadow: var(--soft-shadow);
+}
+
+.brand-strip img {
+  width: min(320px, 100%);
+}
+
+.brand-strip p {
+  margin: 0;
+  color: rgba(36, 27, 23, 0.72);
+  font-family: "Sequin Serif", Georgia, serif;
+  font-size: clamp(1.55rem, 3.1vw, 3.2rem);
+  line-height: 1.02;
+  text-wrap: balance;
 }
 
 .split-paths {
@@ -532,7 +545,7 @@ img {
   min-height: 380px;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 34px;
+  border-radius: var(--radius-card);
   color: var(--cream);
   text-align: left;
   box-shadow: var(--soft-shadow);
@@ -596,6 +609,14 @@ img {
   margin-bottom: 24px;
 }
 
+.section-heading .mini-label,
+.page-heading .mini-label,
+.catalog-hero .mini-label,
+.contact-hero .mini-label,
+.product-info .mini-label {
+  color: var(--bordeaux);
+}
+
 .section-heading h2,
 .editorial-band h2,
 .page-heading h1,
@@ -619,7 +640,7 @@ img {
   position: relative;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 28px;
+  border-radius: var(--radius-card);
   background: rgba(255, 250, 241, 0.8);
   box-shadow: var(--soft-shadow);
 }
@@ -652,7 +673,7 @@ img {
   width: 40px;
   height: 40px;
   border: 1px solid rgba(255, 250, 241, 0.78);
-  border-radius: 50%;
+  border-radius: var(--radius-small);
   background: rgba(255, 250, 241, 0.88);
   color: var(--espresso);
 }
@@ -713,7 +734,7 @@ img {
 .product-footer button {
   min-width: 70px;
   border: 1px solid var(--espresso);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: var(--espresso);
   color: var(--cream);
   padding: 8px 12px;
@@ -728,7 +749,7 @@ img {
   margin-bottom: 74px;
   padding: clamp(26px, 5vw, 64px);
   border: 1px solid var(--line);
-  border-radius: 34px;
+  border-radius: var(--radius-frame);
   background:
     linear-gradient(135deg, rgba(215, 175, 99, 0.2), rgba(141, 152, 116, 0.16)),
     var(--cream);
@@ -754,7 +775,7 @@ img {
 .gallery-grid button {
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 26px;
+  border-radius: var(--radius-card);
   background: var(--linen);
   padding: 0;
   text-align: left;
@@ -782,7 +803,7 @@ img {
 
 .process-strip div {
   border: 1px solid var(--line);
-  border-radius: 28px;
+  border-radius: var(--radius-card);
   background: rgba(255, 250, 241, 0.78);
   padding: 24px;
 }
@@ -814,10 +835,20 @@ img {
   align-items: stretch;
   margin-bottom: 22px;
   border: 1px solid var(--line);
-  border-radius: 34px;
+  border-radius: var(--radius-frame);
   overflow: hidden;
-  background: rgba(255, 250, 241, 0.82);
+  background:
+    linear-gradient(135deg, rgba(255, 250, 241, 0.96), rgba(247, 240, 230, 0.82)),
+    url("/brand/sequin-pattern.svg");
+  background-size: auto, 180px 180px;
   box-shadow: var(--soft-shadow);
+}
+
+.catalog-hero,
+.contact-hero {
+  height: 520px;
+  min-height: 0;
+  max-height: none;
 }
 
 .catalog-hero > div,
@@ -853,7 +884,7 @@ img {
   gap: 10px;
   min-height: 52px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: rgba(255, 250, 241, 0.9);
   padding: 0 16px;
 }
@@ -862,7 +893,7 @@ img {
   display: grid;
   grid-template-columns: 90px minmax(0, 1fr);
   margin-top: 12px;
-  border-radius: 18px;
+  border-radius: var(--radius-small);
 }
 
 .form-field span {
@@ -903,7 +934,7 @@ img {
 .filter-row button {
   flex: 0 0 auto;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: rgba(255, 250, 241, 0.86);
   color: var(--espresso);
   padding: 9px 14px;
@@ -947,7 +978,7 @@ img {
   width: 100%;
   height: 100%;
   min-height: 520px;
-  border-radius: 24px;
+  border-radius: var(--radius-card);
   object-fit: cover;
 }
 
@@ -960,7 +991,7 @@ img {
 .product-gallery div img {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 18px;
+  border-radius: var(--radius-small);
   object-fit: cover;
   background: var(--cream);
 }
@@ -1021,7 +1052,7 @@ img {
   align-items: center;
   gap: 8px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   padding: 10px 12px;
   color: var(--espresso);
   background: rgba(255, 250, 241, 0.78);
@@ -1046,7 +1077,7 @@ img {
   gap: 14px;
   align-items: center;
   border: 1px solid var(--line);
-  border-radius: 24px;
+  border-radius: var(--radius-card);
   background: var(--cream);
   padding: 12px;
 }
@@ -1054,7 +1085,7 @@ img {
 .cart-item img {
   width: 112px;
   height: 128px;
-  border-radius: 18px;
+  border-radius: var(--radius-small);
   object-fit: cover;
 }
 
@@ -1078,7 +1109,7 @@ img {
   align-items: center;
   gap: 8px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   padding: 4px;
 }
 
@@ -1088,7 +1119,7 @@ img {
   width: 28px;
   height: 28px;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--radius-small);
   background: var(--espresso);
   color: var(--cream);
 }
@@ -1112,7 +1143,7 @@ img {
   position: sticky;
   top: 104px;
   border: 1px solid var(--line);
-  border-radius: 28px;
+  border-radius: var(--radius-card);
   background: var(--cream);
   padding: 24px;
 }
@@ -1138,7 +1169,7 @@ img {
   z-index: 150;
   transform: translateX(-50%);
   border: 1px solid var(--line-dark);
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   background: var(--espresso);
   color: var(--cream);
   padding: 12px 18px;
@@ -1195,6 +1226,7 @@ img {
   }
 
   .split-paths,
+  .brand-strip,
   .editorial-band,
   .process-strip,
   .catalog-hero,
@@ -1237,7 +1269,7 @@ img {
     top: 8px;
     width: min(100% - 18px, 1480px);
     margin-block: 8px;
-    border-radius: 24px;
+    border-radius: var(--radius-card);
   }
 
   .brand-lockup small,
@@ -1245,7 +1277,12 @@ img {
     display: none;
   }
 
+  .brand-wordmark {
+    width: 118px;
+  }
+
   .hero-carousel,
+  .brand-strip,
   .split-paths,
   .section-block,
   .editorial-band,
@@ -1262,7 +1299,7 @@ img {
     height: calc(100svh - 90px);
     min-height: 640px;
     max-height: 760px;
-    border-radius: 26px;
+    border-radius: var(--radius-frame);
     margin-bottom: 34px;
   }
 
@@ -1276,6 +1313,7 @@ img {
   .hero-brand-tag {
     top: 20px;
     left: 20px;
+    width: 168px;
   }
 
   .hero-text-card {
@@ -1318,7 +1356,7 @@ img {
     width: 54px;
     height: 54px;
     border: 2px solid rgba(255, 255, 255, 0.48);
-    border-radius: 50%;
+    border-radius: var(--radius-small);
     background: rgba(255, 250, 241, 0.12);
     font-size: 0;
     right: 18px;
@@ -1339,7 +1377,7 @@ img {
   .product-detail,
   .cart-layout,
   .product-card {
-    border-radius: 24px;
+    border-radius: var(--radius-card);
   }
 
   .product-grid,
@@ -1371,6 +1409,11 @@ img {
     aspect-ratio: 4 / 3;
   }
 
+  .catalog-hero,
+  .contact-hero {
+    height: auto;
+  }
+
   .product-gallery > img {
     min-height: 300px;
   }
@@ -1378,6 +1421,15 @@ img {
   .product-actions,
   .contact-grid {
     display: grid;
+  }
+
+  .brand-strip {
+    margin-bottom: 22px;
+    padding: 22px;
+  }
+
+  .brand-strip p {
+    font-size: clamp(1.35rem, 8vw, 2.2rem);
   }
 
   .primary-button,
@@ -1400,6 +1452,10 @@ img {
 @media (max-width: 430px) {
   .brand-lockup strong {
     font-size: 1rem;
+  }
+
+  .brand-wordmark {
+    width: 104px;
   }
 
   .header-actions {

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 140" role="img" aria-labelledby="title">
+  <title id="title">Sequin Table Linen wordmark</title>
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="560" y2="140" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fff0c6"/>
+      <stop offset="0.32" stop-color="#dfbd76"/>
+      <stop offset="0.64" stop-color="#a87738"/>
+      <stop offset="1" stop-color="#f5d792"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#gold)">
+    <text x="20" y="83" font-family="Cormorant Garamond, Georgia, serif" font-size="76" font-weight="400" letter-spacing="2">SEQUIN</text>
+    <text x="149" y="120" font-family="Jost, Arial, sans-serif" font-size="15" font-weight="700" letter-spacing="13">TABLE LINEN</text>
+  </g>
+</svg>

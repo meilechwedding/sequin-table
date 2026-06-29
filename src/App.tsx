@@ -57,6 +57,7 @@ function App() {
   const [activeHero, setActiveHero] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [heroPaused, setHeroPaused] = useState(false);
   const [query, setQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<"All" | ProductCategory>("All");
   const [sort, setSort] = useState<SortKey>("featured");
@@ -82,7 +83,7 @@ function App() {
         ? (current + 1) % heroProducts.length
         : (current + heroProducts.length - 1) % heroProducts.length,
     );
-    window.setTimeout(() => setIsAnimating(false), 650);
+    window.setTimeout(() => setIsAnimating(false), 860);
   };
 
   const addToCart = (product: Product, variant = product.variants[0] ?? "Default", qty = 1, date?: string) => {
@@ -129,9 +130,10 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const timeout = window.setTimeout(() => navigateHero("next"), 5900);
+    if (heroPaused || view !== "home" || selectedProduct) return;
+    const timeout = window.setTimeout(() => navigateHero("next"), 7000);
     return () => window.clearTimeout(timeout);
-  }, [activeHero]);
+  }, [activeHero, heroPaused, view, selectedProduct]);
 
   useEffect(() => {
     const onHash = () => setView(getInitialView());
@@ -144,6 +146,12 @@ function App() {
     const timeout = window.setTimeout(() => setToast(""), 2200);
     return () => window.clearTimeout(timeout);
   }, [toast]);
+
+  useEffect(() => {
+    if (selectedProduct) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [selectedProduct]);
 
   const catalogProducts = useMemo(() => {
     const base = view === "rentals" ? products.filter((product) => product.collection === "Rentals") : products;
@@ -180,6 +188,7 @@ function App() {
             isMobile={isMobile}
             onPrev={() => navigateHero("prev")}
             onNext={() => navigateHero("next")}
+            onPause={setHeroPaused}
             onNavigate={navigate}
             onOpenProduct={setSelectedProduct}
           />
@@ -249,10 +258,7 @@ function Header({
     <header className="site-header">
       <a className="brand-lockup" href="#home" onClick={() => onNavigate("home")} aria-label="Sequin Table home">
         <img src="/brand/monogram.svg" alt="" />
-        <span>
-          <strong>Sequin Table</strong>
-          <small>Rental and home linens</small>
-        </span>
+        <img className="brand-wordmark" src="/brand/sequin-wordmark.svg" alt="Sequin Table Linen" />
       </a>
 
       <nav className="desktop-nav" aria-label="Primary navigation">
@@ -304,6 +310,7 @@ function Hero({
   isMobile,
   onPrev,
   onNext,
+  onPause,
   onNavigate,
   onOpenProduct,
 }: {
@@ -311,6 +318,7 @@ function Hero({
   isMobile: boolean;
   onPrev: () => void;
   onNext: () => void;
+  onPause: (paused: boolean) => void;
   onNavigate: (view: View) => void;
   onOpenProduct: (product: Product) => void;
 }) {
@@ -320,11 +328,19 @@ function Hero({
     <section
       className="hero-carousel"
       aria-label="Sequin Table featured tablecloth carousel"
-      style={{ backgroundColor: current.heroBg ?? current.palette }}
+      onMouseEnter={() => onPause(true)}
+      onMouseLeave={() => onPause(false)}
+      onFocus={() => onPause(true)}
+      onBlur={() => onPause(false)}
+      style={{
+        background:
+          `radial-gradient(circle at 52% 68%, ${current.heroPanel ?? current.palette} 0%, transparent 44%), ` +
+          `linear-gradient(145deg, ${current.heroBg ?? current.palette} 0%, ${current.palette} 100%)`,
+      }}
     >
       <div className="grain-layer" />
-      <div className="hero-ghost">SEQUIN TABLE</div>
-      <span className="hero-brand-tag">SEQUIN TABLE</span>
+      <div className="hero-ghost">{current.title}</div>
+      <img className="hero-brand-tag" src="/brand/sequin-logo-full.svg" alt="Sequin Table Linen" />
 
       <div className="hero-object-stage">
         {heroProducts.map((product, index) => {
@@ -352,9 +368,9 @@ function Hero({
       </div>
 
       <div className="hero-text-card">
-        <p>{current.collection}</p>
+        <p>{current.collection} / {current.category}</p>
         <h1>{current.title}</h1>
-        <span>{current.description}</span>
+        <span>{getHeroCopy(current)}</span>
         <div>
           <button type="button" className="round-cta light" onClick={() => onNavigate("shop")}>
             Shop
@@ -402,7 +418,7 @@ function getHeroRoleStyle(role: "center" | "left" | "right" | "back", isMobile: 
       bottom: isMobile ? "42%" : "14%",
       height: isMobile ? "18%" : "28%",
       transform: "translateX(-50%) scale(1)",
-      opacity: 0.82,
+      opacity: 1,
       filter: "blur(1.5px)",
       zIndex: 10,
     };
@@ -412,10 +428,17 @@ function getHeroRoleStyle(role: "center" | "left" | "right" | "back", isMobile: 
     bottom: isMobile ? "43%" : "16%",
     height: isMobile ? "14%" : "22%",
     transform: "translateX(-50%) scale(1)",
-    opacity: 0.55,
+    opacity: 1,
     filter: "blur(3px)",
     zIndex: 5,
   };
+}
+
+function getHeroCopy(product: Product) {
+  if (product.collection === "Rentals") {
+    return `${product.title} brings event-scale texture with a refined Sequin Table finish. Select the size, quantity, and date to request availability.`;
+  }
+  return `${product.title} is designed for a premium home table with a clean profile, rich texture, and a finished Sequin Table look.`;
 }
 
 function HomeContent({
@@ -436,6 +459,11 @@ function HomeContent({
 
   return (
     <>
+      <section className="brand-strip" aria-label="Sequin brand promise">
+        <img src="/brand/sequin-logo-espresso.svg" alt="Sequin Table Linen" />
+        <p>Premium table linens for homes, hosts, and events that need a finished point of view.</p>
+      </section>
+
       <section className="split-paths" aria-label="Shop and rental paths">
         <button className="path-card path-shop" type="button" onClick={() => onNavigate("shop")}>
           <img src="/products/lisbon-ribbed-white.jpg" alt="" />
@@ -453,8 +481,8 @@ function HomeContent({
 
       <section className="section-block">
         <div className="section-heading">
-          <p className="mini-label">Current favorites</p>
-          <h2>Clean whites, soft velvets, lace overlays, and finished event textures.</h2>
+          <p className="mini-label">Signature textures</p>
+          <h2>Tablecloths with quiet color, sculpted texture, and a polished finish.</h2>
           <button type="button" className="text-button" onClick={() => onNavigate("shop")}>
             View full shop
             <ArrowRight size={18} />
@@ -477,10 +505,10 @@ function HomeContent({
       <section className="editorial-band">
         <div>
           <p className="mini-label">For planners and hosts</p>
-          <h2>One brand for buying a tablecloth and renting a full table story.</h2>
+          <h2>Buy for home. Rent for the event. Keep the table language consistent.</h2>
           <p>
-            Sequin Table keeps the product experience simple: shop home pieces with prices, or request
-            event availability without showing rental pricing online.
+            Build a full table story from lace, velvet, quilted cloths, napkins, and rings. The result
+            should feel designed before the first plate is placed.
           </p>
           <button type="button" className="primary-button dark" onClick={() => onNavigate("rentals")}>
             Explore Rental Quote
@@ -500,7 +528,7 @@ function HomeContent({
       <section className="process-strip">
         {[
           ["Shop", "Choose a tablecloth size, quantity, and color direction for your home table."],
-          ["Quote", "Select rental pieces, date, size, and quantity, then send an inquiry to Sequin."],
+          ["Quote", "Select rental pieces, date, size, and quantity, then request availability."],
           ["Style", "Layer lace, velvet, napkins, and rings into a polished finished setting."],
         ].map(([title, copy]) => (
           <div key={title}>
@@ -547,12 +575,12 @@ function CatalogView({
     <main className="catalog-page">
       <section className="catalog-hero">
         <div>
-          <p className="mini-label">{isRental ? "Rentals" : "Shop"}</p>
+          <p className="mini-label">{isRental ? "Rental collection" : "Home collection"}</p>
           <h1>{isRental ? "Event Linen Rentals" : "Shop Table Linens"}</h1>
           <p>
             {isRental
-              ? "No rental prices are shown online. Select size, quantity, and event date, then send an availability request."
-              : "A visual Shopify storefront for tablecloths, overlays, napkins, and finishing pieces."}
+              ? "Browse event-ready cloths, overlays, toppers, napkins, and rings. Choose the pieces, add event details, and request availability."
+              : "Premium tablecloths and finishing pieces for a table that feels intentional without feeling overdone."}
           </p>
         </div>
         <img src={isRental ? "/products/white-pendant-lace.jpg" : "/products/lisbon-ribbed.jpg"} alt="" />
@@ -682,7 +710,7 @@ function ProductView({
         <div className="product-gallery">
           <img src={product.image} alt={product.title} />
           <div>
-            {[product.image, product.heroAsset ?? product.image, ...related.slice(0, 2).map((item) => item.image)].map((image, index) => (
+            {[product.image, ...related.slice(0, 3).map((item) => item.image)].map((image, index) => (
               <img key={`${image}-${index}`} src={image} alt="" />
             ))}
           </div>
@@ -761,8 +789,8 @@ function GalleryView({ onOpenProduct }: { onOpenProduct: (product: Product) => v
     <main className="gallery-page">
       <section className="page-heading">
         <p className="mini-label">Gallery</p>
-        <h1>Texture, color, and tablecloth details.</h1>
-        <p>Not an Instagram feed, just a clean visual library of Sequin product surfaces.</p>
+        <h1>Texture, color, styled surfaces, and product detail.</h1>
+        <p>A visual library for choosing the mood of the table before choosing the exact piece.</p>
       </section>
       <section className="gallery-grid">
         {gallery.map((product, index) => (
@@ -782,10 +810,10 @@ function ContactView({ onNavigate }: { onNavigate: (view: View) => void }) {
       <section className="contact-hero">
         <div>
           <p className="mini-label">Contact Sequin</p>
-          <h1>Tell us what kind of table you are building.</h1>
+          <h1>Tell us the table, date, and direction.</h1>
           <p>
-            For rentals, send the product list, date, quantities, and event notes. For shopping, this page
-            keeps the visual flow ready for Shopify upload.
+            For rentals, send the product list, date, quantities, and event notes. For home linens,
+            reach out for sizing or styling help.
           </p>
           <div className="contact-grid">
             <a href={`tel:${contactPhone.replaceAll("-", "")}`}>
@@ -832,8 +860,8 @@ function CartView({
     <main className="cart-page">
       <section className="page-heading">
         <p className="mini-label">Cart</p>
-        <h1>Checkout-style visual cart.</h1>
-        <p>Payment is intentionally not connected yet. This is ready as a Shopify visual prototype.</p>
+        <h1>Your selected table pieces.</h1>
+        <p>Review purchase pieces and rental quote items before sending the request.</p>
       </section>
 
       <section className="cart-layout">
@@ -872,7 +900,7 @@ function CartView({
         <aside className="cart-summary">
           <span>Estimated purchase total</span>
           <strong>{total > 0 ? `$${total.toFixed(2)}` : "Quote needed"}</strong>
-          <p>Rental items stay as inquiry items and never show pricing online.</p>
+          <p>Rental items stay as inquiry items and do not show pricing online.</p>
           <a className="primary-button dark" href={`mailto:${contactEmail}?subject=Sequin Table request&body=${quoteText}`}>
             Email Request
             <Mail size={18} />
