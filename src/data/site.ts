@@ -35,18 +35,20 @@ export const contact = {
   area: "Brooklyn, with white-glove delivery across New York & New Jersey.",
 };
 
-/** The noir stage — each slide pairs a cloth cutout with a room tint. */
+/** The stage — each slide pairs a cloth cutout with a room color.
+    bg fills the hero, tint feeds the radial glow behind the cloth. */
 export type HeroSlide = {
   productId: string;
   image: string;
   tint: string;
+  bg: string;
 };
 
 export const heroSlides: HeroSlide[] = [
-  { productId: "home-lisbon-white", image: "/hero3d/lisbon-ribbed-white.png", tint: "#46564c" },
-  { productId: "home-willow", image: "/hero3d/willow-quilted.png", tint: "#4b5434" },
-  { productId: "home-flutter", image: "/hero3d/flutter-overlay.png", tint: "#6b4a33" },
-  { productId: "home-doria-eyelet", image: "/hero3d/doria-eyelet.png", tint: "#54303c" },
+  { productId: "home-lisbon-white", image: "/hero3d/lisbon-ribbed-white.png", tint: "#5c7264", bg: "#3b4a41" },
+  { productId: "home-willow", image: "/hero3d/willow-quilted.png", tint: "#697547", bg: "#414a2c" },
+  { productId: "home-flutter", image: "/hero3d/flutter-overlay.png", tint: "#8a5f41", bg: "#573b2a" },
+  { productId: "home-doria-eyelet", image: "/hero3d/doria-eyelet.png", tint: "#74424f", bg: "#472a33" },
 ];
 
 export const testimonials = [
