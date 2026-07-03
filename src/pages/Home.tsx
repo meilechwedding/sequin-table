@@ -37,7 +37,7 @@ export default function Home() {
                     Event linen delivered pressed and picked up after — weddings, simchos, dinners.
                   </span>
                   <span className="btn-link">
-                    Explore Rentals <ArrowRight size={15} strokeWidth={2} />
+                    Rent for an Event <ArrowRight size={15} strokeWidth={2} />
                   </span>
                 </span>
               </Link>
@@ -53,7 +53,7 @@ export default function Home() {
                     Velvet, quilted, and lace pieces made to live on your table, not in a drawer.
                   </span>
                   <span className="btn-link">
-                    Shop the Collection <ArrowRight size={15} strokeWidth={2} />
+                    Buy for Home <ArrowRight size={15} strokeWidth={2} />
                   </span>
                 </span>
               </Link>
@@ -178,7 +178,7 @@ export default function Home() {
                 {homeCopy.closingTitle}
               </h2>
               <p className="lede" style={{ textAlign: "center" }}>{homeCopy.closingLine}</p>
-              <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
+              <div className="cta-row is-center">
                 <Link to="/contact" className="btn btn-gold">
                   Plan an Event
                 </Link>

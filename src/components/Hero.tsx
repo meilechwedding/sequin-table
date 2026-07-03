@@ -7,11 +7,15 @@ import { productById } from "../lib/store";
 
 const INTERVAL = 7000;
 
+/** "Lisbon Ribbed White" → "LISBON"; "The Flutter Overlay" → "FLUTTER" */
+const ghostWord = (title: string) => title.replace(/^The\s+/i, "").split(" ")[0];
+
 export default function Hero() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [chipSwap, setChipSwap] = useState(false);
   const timer = useRef<number | null>(null);
+  const stageRef = useRef<HTMLDivElement | null>(null);
 
   const slides = useMemo(
     () =>
@@ -32,7 +36,7 @@ export default function Hero() {
     [slides.length],
   );
 
-  // autoplay — pauses on hover/focus and for reduced-motion users
+  // autoplay — pauses on hover/focus/touch and for reduced-motion users
   useEffect(() => {
     if (paused) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -50,6 +54,24 @@ export default function Hero() {
     });
   }, [slides]);
 
+  // gentle 3D parallax: cloth drifts with the pointer, ghost name drifts against it
+  const onStageMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const el = stageRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    el.style.setProperty("--par-x", x.toFixed(3));
+    el.style.setProperty("--par-y", y.toFixed(3));
+  }, []);
+  const onStageLeave = useCallback(() => {
+    const el = stageRef.current;
+    if (!el) return;
+    el.style.setProperty("--par-x", "0");
+    el.style.setProperty("--par-y", "0");
+  }, []);
+
   const current = slides[active];
   if (!current?.product) return null;
   const isRental = current.product.price === 0;
@@ -62,6 +84,8 @@ export default function Hero() {
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
       onBlurCapture={() => setPaused(false)}
+      onTouchStart={() => setPaused(true)}
+      onTouchEnd={() => setPaused(false)}
     >
       <div className="hero-tint" style={{ ["--stage-tint" as string]: current.tint }} aria-hidden />
 
@@ -75,15 +99,31 @@ export default function Hero() {
           <p className="hero-sub">{homeCopy.heroSub}</p>
           <div className="hero-ctas">
             <Link to="/rentals" className="btn btn-gold">
-              Explore Rentals
+              Rent for an Event
             </Link>
             <Link to="/shop" className="btn btn-ghost">
-              Shop Home Linen
+              Buy for Home
             </Link>
           </div>
         </div>
 
-        <div className="hero-stage">
+        <div
+          className="hero-stage"
+          ref={stageRef}
+          onMouseMove={onStageMove}
+          onMouseLeave={onStageLeave}
+        >
+          <div className="hero-ghost" aria-hidden>
+            {slides.map((slide, index) => (
+              <span
+                key={slide.productId}
+                className={index === active ? "is-active" : ""}
+              >
+                {ghostWord(slide.product!.title)}
+              </span>
+            ))}
+          </div>
+
           {slides.map((slide, index) => (
             <div
               key={slide.productId}
@@ -108,7 +148,7 @@ export default function Hero() {
             className={`hero-chip${chipSwap ? " is-swapping" : ""}`}
             aria-label={`View ${current.product.title}`}
           >
-            <span style={{ display: "grid", gap: 2 }}>
+            <span style={{ display: "grid", gap: 2, minWidth: 0 }}>
               <span className="chip-name">{current.product.title}</span>
               <span className="chip-price">
                 {isRental ? "Rental · by quote" : `From ${formatPrice(current.product.price)}`}

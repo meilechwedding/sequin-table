@@ -4,12 +4,29 @@ import { Reveal } from "../components/bits";
 import { contact } from "../data/site";
 import { useDocTitle } from "../lib/hooks";
 
+const occasions = [
+  "Wedding",
+  "Sheva Brachos / Simcha",
+  "Dinner Party",
+  "Corporate Event",
+  "My Table at Home",
+  "Something Else",
+];
+const tableCounts = ["1–5", "6–15", "16–40", "40+"];
+
 export default function Contact() {
   useDocTitle("Contact");
   const [sent, setSent] = useState(false);
+  const [occasion, setOccasion] = useState<string | null>(null);
+  const [tables, setTables] = useState<string | null>(null);
+  const [occasionError, setOccasionError] = useState(false);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!occasion) {
+      setOccasionError(true);
+      return;
+    }
     setSent(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -17,14 +34,14 @@ export default function Contact() {
   return (
     <main>
       <div className="wrap">
-        <header className="page-head">
-          <span className="eyebrow">Contact</span>
-          <h1 className="display-xl" style={{ maxWidth: "14ch" }}>
+        <header className="page-head is-compact">
+          <span className="eyebrow">Start a Quote</span>
+          <h1 className="display-lg" style={{ maxWidth: "16ch" }}>
             Tell Us About the Table
           </h1>
           <p className="lede">
-            A date, a venue, a feeling you're after — that's enough to begin. We answer within one
-            business day.
+            Three quick choices and your details — we answer with linen suggestions and a quote
+            within one business day.
           </p>
         </header>
 
@@ -46,6 +63,55 @@ export default function Contact() {
           ) : (
             <Reveal>
               <form className="card checkout-step" onSubmit={submit}>
+                <div className="field">
+                  <label id="q-occasion">1 · What are we dressing?</label>
+                  <div className="choice-row" role="group" aria-labelledby="q-occasion">
+                    {occasions.map((o) => (
+                      <button
+                        key={o}
+                        type="button"
+                        className={`chip${occasion === o ? " is-active" : ""}`}
+                        aria-pressed={occasion === o}
+                        onClick={() => {
+                          setOccasion(occasion === o ? null : o);
+                          setOccasionError(false);
+                        }}
+                      >
+                        {o}
+                      </button>
+                    ))}
+                  </div>
+                  {occasionError && (
+                    <span className="field-error">Choose the occasion so we can point you right.</span>
+                  )}
+                </div>
+
+                <div className="form-grid">
+                  <div className="field">
+                    <label htmlFor="c-date">2 · Event date</label>
+                    <input id="c-date" type="date" min={new Date().toISOString().slice(0, 10)} />
+                    <span className="field-hint">Not set yet? Leave it blank — we'll hold ideas, not dates.</span>
+                  </div>
+                  <div className="field">
+                    <label id="q-tables">3 · How many tables?</label>
+                    <div className="choice-row" role="group" aria-labelledby="q-tables">
+                      {tableCounts.map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          className={`chip${tables === t ? " is-active" : ""}`}
+                          aria-pressed={tables === t}
+                          onClick={() => setTables(tables === t ? null : t)}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <hr className="hairline" />
+
                 <div className="form-grid">
                   <div className="field">
                     <label htmlFor="c-name">Name</label>
@@ -55,31 +121,13 @@ export default function Contact() {
                     <label htmlFor="c-phone">Phone</label>
                     <input id="c-phone" type="tel" placeholder="Best number" autoComplete="tel" />
                   </div>
-                  <div className="field">
+                  <div className="field span-2">
                     <label htmlFor="c-email">Email</label>
                     <input id="c-email" type="email" required placeholder="you@example.com" autoComplete="email" />
                   </div>
-                  <div className="field">
-                    <label htmlFor="c-date">Event date (if any)</label>
-                    <input id="c-date" type="date" min={new Date().toISOString().slice(0, 10)} />
-                  </div>
-                  <div className="field span-2">
-                    <label htmlFor="c-type">What are we dressing?</label>
-                    <select id="c-type" defaultValue="">
-                      <option value="" disabled>
-                        Choose one…
-                      </option>
-                      <option>Wedding</option>
-                      <option>Sheva Brachos / Simcha</option>
-                      <option>Dinner party</option>
-                      <option>Corporate event</option>
-                      <option>My own table at home</option>
-                      <option>Something else</option>
-                    </select>
-                  </div>
                   <div className="field span-2">
                     <label htmlFor="c-msg">The details</label>
-                    <textarea id="c-msg" placeholder="Venue, table count, colors you love — whatever you know so far." />
+                    <textarea id="c-msg" placeholder="Venue, colors you love, pieces that caught your eye — whatever you know so far." />
                   </div>
                 </div>
                 <button className="btn btn-gold" type="submit" style={{ justifySelf: "start" }}>

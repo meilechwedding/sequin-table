@@ -70,28 +70,42 @@ export const testimonials = [
   },
 ];
 
+export type GalleryOccasion = "Weddings" | "Dinner Parties" | "Shabbos & Yom Tov" | "At Home";
+
 export type GalleryItem = {
   src: string;
   alt: string;
-  occasion: "Weddings" | "Dinner Parties" | "Shabbos & Yom Tov" | "At Home";
+  occasion: GalleryOccasion;
+  /** The cloth on the table — shown in the caption. */
+  cloth: string;
+  /** Links the look to a piece in the collection, when it's carried. */
+  productHandle?: string;
 };
 
 export const galleryItems: GalleryItem[] = [
-  { src: heroImg, alt: "White ribbed linen with gold flatware and bordeaux roses in a conservatory", occasion: "Dinner Parties" },
-  { src: rentalsImg, alt: "Long banquet table dressed in patterned linen with tall florals", occasion: "Weddings" },
-  { src: homeImg, alt: "Lace-dressed table with white seating and marble accents", occasion: "Shabbos & Yom Tov" },
-  { src: dijanImg, alt: "Layered neutral tablescape with textured linen", occasion: "At Home" },
-  { src: hamtonImg, alt: "Lattice overlay on a garden-party table", occasion: "Dinner Parties" },
-  { src: lilacImg, alt: "Soft lilac florals over crisp white linen", occasion: "Weddings" },
-  { src: taupeImg, alt: "Taupe pendant lace catching the afternoon light", occasion: "At Home" },
-  { src: willowImg, alt: "Willow quilted cloth set for an intimate dinner", occasion: "Shabbos & Yom Tov" },
-  { src: "/products/golden-hour-striped.jpg", alt: "Golden hour striped linen in warm light", occasion: "Dinner Parties" },
-  { src: "/products/hamptons-lattice-overlay.jpg", alt: "Hamptons lattice overlay, styled", occasion: "Weddings" },
-  { src: "/products/lisbon-ribbed-rose.jpg", alt: "Lisbon ribbed linen in rose", occasion: "At Home" },
-  { src: "/products/astoria-butter-sage-scalloped-topper.jpg", alt: "Astoria scalloped topper in butter and sage", occasion: "Shabbos & Yom Tov" },
+  { src: heroImg, alt: "White ribbed linen with gold flatware and bordeaux roses in a conservatory", occasion: "Dinner Parties", cloth: "Lisbon Ribbed White", productHandle: "lisbon-ribbed-white" },
+  { src: rentalsImg, alt: "Long banquet table dressed in patterned linen with tall florals", occasion: "Weddings", cloth: "Golden Hour Striped", productHandle: "golden-hour-striped" },
+  { src: homeImg, alt: "Lace-dressed table with white seating and marble accents", occasion: "Shabbos & Yom Tov", cloth: "White Pendant Lace", productHandle: "pendant-lace" },
+  { src: dijanImg, alt: "Layered neutral tablescape with textured linen", occasion: "At Home", cloth: "Taupe Velvet", productHandle: "nude-velvet" },
+  { src: hamtonImg, alt: "Lattice overlay on a garden-party table", occasion: "Dinner Parties", cloth: "Hamptons Lattice Overlay", productHandle: "hampton-lattice-overlay" },
+  { src: lilacImg, alt: "Soft lilac florals over crisp white linen", occasion: "Weddings", cloth: "The Flutter Overlay", productHandle: "the-flutter-overlay" },
+  { src: taupeImg, alt: "Taupe pendant lace catching the afternoon light", occasion: "At Home", cloth: "Taupe Pendant Lace", productHandle: "taupe-pendant-lace-1" },
+  { src: willowImg, alt: "Willow quilted cloth set for an intimate dinner", occasion: "Shabbos & Yom Tov", cloth: "Willow Quilted", productHandle: "willow-quilted" },
+  { src: "/products/golden-hour-striped.jpg", alt: "Golden hour striped linen in warm light", occasion: "Dinner Parties", cloth: "Golden Hour Striped", productHandle: "golden-hour-striped" },
+  { src: "/products/hamptons-lattice-overlay.jpg", alt: "Hamptons lattice overlay, styled", occasion: "Weddings", cloth: "Hamptons Lattice Overlay", productHandle: "hamptons-lattice-overlay" },
+  { src: "/products/lisbon-ribbed-rose.jpg", alt: "Lisbon ribbed linen in rose", occasion: "At Home", cloth: "Lisbon Ribbed Rose", productHandle: "lisbon-ribbed-rose" },
+  { src: "/products/astoria-butter-sage-scalloped-topper.jpg", alt: "Astoria scalloped topper in butter and sage", occasion: "Shabbos & Yom Tov", cloth: "Astoria Scalloped Topper", productHandle: "astoria-butter-sage-scalloped-topper" },
 ];
 
 export const galleryOccasions = ["All", "Weddings", "Dinner Parties", "Shabbos & Yom Tov", "At Home"] as const;
+
+/** Occasion accents — the quiet use of the wider palette. */
+export const occasionAccent: Record<GalleryOccasion, string> = {
+  Weddings: "#be9a6e",
+  "Dinner Parties": "#6a2635",
+  "Shabbos & Yom Tov": "#8fa5b5",
+  "At Home": "#8d9874",
+};
 
 /** Accordion copy for product pages, keyed by intent. */
 export const productCare = {
@@ -122,10 +136,10 @@ export const productCare = {
 
 export const homeCopy = {
   heroEyebrow: "Brooklyn Linen House",
-  heroTitleA: "Upscale Table Linen for",
-  heroTitleAccent: "Every",
-  heroTitleB: "Celebration",
-  heroSub: "Linen to rent for the occasion — or own for always. Pressed, wrapped, and delivered ready to lay.",
+  heroTitleA: "Linen That",
+  heroTitleAccent: "Dresses",
+  heroTitleB: "the Room",
+  heroSub: "Rent it for the event, or own it for always — pressed, wrapped, and delivered ready to lay.",
   twoWaysEyebrow: "Two Ways to Sequin",
   twoWaysTitle: "Rent for the Event. Own for the Table.",
   featuredEyebrow: "The Collection",

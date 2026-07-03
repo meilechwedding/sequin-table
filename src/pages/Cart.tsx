@@ -11,19 +11,35 @@ export default function CartPage() {
   const { cart, updateQty, removeLine, setLineDate } = useStore();
   const navigate = useNavigate();
   const { purchase, rental, subtotal } = cartTotals(cart);
+  const rentalsOnly = purchase.length === 0 && rental.length > 0;
 
   const lineIndex = (line: (typeof cart)[number]) => cart.indexOf(line);
 
   if (cart.length === 0) {
     return (
       <main className="wrap">
-        <div className="empty-state" style={{ minHeight: "50vh" }}>
+        <div className="empty-cart">
           <ShoppingBag size={30} strokeWidth={1.4} style={{ color: "var(--accent)" }} />
           <h1 className="display-lg">Your cart is waiting to be set.</h1>
-          <p>Rentals for the event, linens for home — begin wherever the occasion takes you.</p>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
-            <Link to="/rentals" className="btn btn-gold btn-sm">Explore Rentals</Link>
-            <Link to="/shop" className="btn btn-ghost btn-sm">Shop Home Linen</Link>
+          <p className="lede" style={{ textAlign: "center" }}>
+            One cart, two doors — home linen you buy today, and event rentals we quote for your
+            date.
+          </p>
+          <div className="empty-cart-doors">
+            <div className="card empty-door">
+              <b>Buy for home</b>
+              <p>Velvet, quilted, and lace pieces ship to your door — pay at checkout.</p>
+              <Link to="/shop" className="btn-link">
+                Shop Home Linen <ArrowRight size={14} strokeWidth={2} />
+              </Link>
+            </div>
+            <div className="card empty-door">
+              <b>Rent for an event</b>
+              <p>Add pieces with your date — nothing is charged until we confirm the quote.</p>
+              <Link to="/rentals" className="btn-link">
+                Explore Rentals <ArrowRight size={14} strokeWidth={2} />
+              </Link>
+            </div>
           </div>
         </div>
       </main>
@@ -32,10 +48,10 @@ export default function CartPage() {
 
   return (
     <main>
-      <div className="wrap">
-        <header className="page-head">
+      <div className="wrap" style={{ minHeight: "60vh" }}>
+        <header className="page-head is-compact">
           <span className="eyebrow">Your Cart</span>
-          <h1 className="display-xl">The Table So Far</h1>
+          <h1 className="display-lg">The Table So Far</h1>
         </header>
 
         <div className="cart-layout">
@@ -107,7 +123,7 @@ export default function CartPage() {
                               value={line.date ?? ""}
                               min={new Date().toISOString().slice(0, 10)}
                               onChange={(e) => setLineDate(idx, e.target.value)}
-                              style={{ border: "1px solid var(--line)", borderRadius: 8, padding: "4px 8px", background: "transparent" }}
+                              style={{ border: "1px solid var(--line)", borderRadius: "var(--radius-mini)", padding: "4px 8px", background: "transparent" }}
                               aria-label={`Event date for ${product.title}`}
                             />
                           </label>
@@ -131,10 +147,12 @@ export default function CartPage() {
             <aside className="card summary-card" aria-label="Order summary">
               <h2 className="display-sm">Summary</h2>
               <hr className="foil-rule" />
-              <div className="summary-row">
-                <span>Home linen subtotal</span>
-                <span className="tnum">{formatPrice(subtotal)}</span>
-              </div>
+              {purchase.length > 0 && (
+                <div className="summary-row">
+                  <span>Home linen subtotal</span>
+                  <span className="tnum">{formatPrice(subtotal)}</span>
+                </div>
+              )}
               {rental.length > 0 && (
                 <div className="summary-row">
                   <span>Event rentals</span>
@@ -142,22 +160,23 @@ export default function CartPage() {
                 </div>
               )}
               <div className="summary-row">
-                <span>Delivery</span>
+                <span>White-glove delivery</span>
                 <span>Calculated at review</span>
               </div>
               <hr className="hairline" />
               <div className="summary-row total">
-                <span>Today</span>
+                <span>Due today</span>
                 <span className="tnum">{formatPrice(subtotal)}</span>
               </div>
               <button className="btn btn-gold" onClick={() => navigate("/checkout")}>
-                Continue to Checkout
+                {rentalsOnly ? "Request the Quote" : "Continue to Checkout"}
                 <ArrowRight size={16} strokeWidth={2} />
               </button>
               <p className="summary-note" style={{ display: "flex", gap: 8 }}>
                 <Info size={15} strokeWidth={1.7} style={{ flex: "none", marginTop: 2 }} />
-                Rental pieces are confirmed and priced by our team for your event date — checkout
-                sends the request, nothing is charged.
+                {rentalsOnly
+                  ? "Rental pieces are priced by our team for your event date — sending the request costs nothing."
+                  : "Home linen is paid at checkout. Rental pieces are quoted separately for your event date — those cost nothing today."}
               </p>
             </aside>
           </Reveal>

@@ -1,12 +1,22 @@
 import { Link } from "react-router-dom";
-import { Eye, Heart } from "lucide-react";
+import { CalendarDays, ShoppingBag } from "lucide-react";
 import { formatPrice, type Product } from "../data/products";
 import { useStore } from "../lib/store";
 
+/**
+ * A textile swatch: consistent 4:5 crop up top, a structured
+ * "ticket" below — category + color dot, name, price/quote —
+ * and exactly one CTA.
+ */
 export default function ProductCard({ product }: { product: Product }) {
-  const { saved, toggleSaved } = useStore();
-  const isSaved = saved.includes(product.id);
+  const { addToCart, setDrawerOpen } = useStore();
   const isRental = product.price === 0;
+  const singleSize = !isRental && product.variants.length <= 1;
+
+  const quickAdd = () => {
+    addToCart(product);
+    setDrawerOpen(true);
+  };
 
   return (
     <article className="product-card">
@@ -18,27 +28,39 @@ export default function ProductCard({ product }: { product: Product }) {
           {product.featured && <span className="tag tag-gold">Signature</span>}
           {isRental && <span className="tag tag-noir">Rental</span>}
         </div>
-        <button
-          className={`pc-save${isSaved ? " is-saved" : ""}`}
-          aria-label={isSaved ? `Remove ${product.title} from saved` : `Save ${product.title}`}
-          aria-pressed={isSaved}
-          onClick={() => toggleSaved(product.id)}
-        >
-          <Heart size={18} strokeWidth={1.7} fill={isSaved ? "currentColor" : "none"} />
-        </button>
-        <Link to={`/product/${product.handle}`} className="pc-view" tabIndex={-1}>
-          <Eye size={16} strokeWidth={1.7} />
-          View Piece
-        </Link>
       </div>
-      <div className="pc-meta">
-        <span className="pc-cat">{product.category}</span>
-        <h3 className="pc-title">
-          <Link to={`/product/${product.handle}`}>{product.title}</Link>
-        </h3>
-        <span className="pc-price tnum">
-          {isRental ? <span className="quote">Rental · by quote</span> : `From ${formatPrice(product.price)}`}
-        </span>
+      <div className="pc-body">
+        <div className="pc-top">
+          <span className="pc-cat">
+            <span className="pc-dot" style={{ background: product.palette }} aria-hidden />
+            {product.category}
+          </span>
+          <h3 className="pc-title">
+            <Link to={`/product/${product.handle}`}>{product.title}</Link>
+          </h3>
+          <span className="pc-price tnum">
+            {isRental ? (
+              <span className="quote">By quote · for your date</span>
+            ) : (
+              `From ${formatPrice(product.price)}`
+            )}
+          </span>
+        </div>
+        {isRental ? (
+          <Link to={`/product/${product.handle}`} className="pc-cta">
+            <CalendarDays size={15} strokeWidth={1.8} />
+            Add to Quote
+          </Link>
+        ) : singleSize ? (
+          <button type="button" className="pc-cta" onClick={quickAdd}>
+            <ShoppingBag size={15} strokeWidth={1.8} />
+            Add to Cart
+          </button>
+        ) : (
+          <Link to={`/product/${product.handle}`} className="pc-cta">
+            View Sizes
+          </Link>
+        )}
       </div>
     </article>
   );

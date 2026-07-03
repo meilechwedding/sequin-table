@@ -1,21 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Heart, Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Menu, Search, ShoppingBag, X } from "lucide-react";
 import { useScrolled } from "../lib/hooks";
 import { useStore } from "../lib/store";
+import { formatPrice, products } from "../data/products";
 
 const leftNav = [
-  { to: "/rentals", label: "Party Rentals" },
-  { to: "/shop", label: "Home Linen" },
+  { to: "/rentals", label: "Rentals" },
+  { to: "/shop", label: "Shop" },
 ];
 const rightNav = [
-  { to: "/story", label: "Our Story" },
   { to: "/gallery", label: "Gallery" },
   { to: "/contact", label: "Contact" },
 ];
+const menuNav = [...leftNav, ...rightNav, { to: "/story", label: "Our Story" }];
 
 export default function Header() {
-  const { cart, saved, setDrawerOpen } = useStore();
+  const { cart, setDrawerOpen } = useStore();
   const location = useLocation();
   const navigate = useNavigate();
   const scrolled = useScrolled(40);
@@ -44,6 +45,14 @@ export default function Header() {
     };
   }, [menuOpen]);
 
+  const suggestions = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (q.length < 2) return [];
+    return products
+      .filter((p) => `${p.title} ${p.category} ${p.tags.join(" ")}`.toLowerCase().includes(q))
+      .slice(0, 5);
+  }, [query]);
+
   const submitSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const q = query.trim();
@@ -52,11 +61,14 @@ export default function Header() {
     navigate(q ? `/shop?q=${encodeURIComponent(q)}` : "/shop");
   };
 
-  const allNav = [...leftNav, ...rightNav];
+  const goToSuggestion = (handle: string) => {
+    setSearchOpen(false);
+    setQuery("");
+    navigate(`/product/${handle}`);
+  };
 
   return (
     <>
-      <div className="announce">Brooklyn Linen House · White-Glove Service Across NY &amp; NJ</div>
       <header
         className={`site-header ${overNoir ? "header-dark" : "header-solid"}`}
         style={{ position: "sticky" }}
@@ -101,14 +113,11 @@ export default function Header() {
             <button
               className="icon-btn"
               aria-label="Search the collection"
+              aria-expanded={searchOpen}
               onClick={() => setSearchOpen((open) => !open)}
             >
               <Search size={19} strokeWidth={1.6} />
             </button>
-            <Link to="/shop?saved=1" className="icon-btn" aria-label={`Saved pieces (${saved.length})`}>
-              <Heart size={19} strokeWidth={1.6} />
-              {saved.length > 0 && <span className="count">{saved.length}</span>}
-            </Link>
             <button
               className="icon-btn"
               aria-label={`Open cart (${cartCount} items)`}
@@ -121,16 +130,38 @@ export default function Header() {
 
           {searchOpen && (
             <form className="search-pop" onSubmit={submitSearch}>
-              <input
-                ref={searchRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search linens — velvet, lace, quilted…"
-                aria-label="Search the collection"
-              />
-              <button type="submit" className="btn btn-dark btn-sm">
-                Search
-              </button>
+              <div className="search-row">
+                <input
+                  ref={searchRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search linens — velvet, lace, quilted…"
+                  aria-label="Search the collection"
+                />
+                <button type="submit" className="btn btn-dark btn-sm">
+                  Search
+                </button>
+              </div>
+              {suggestions.length > 0 && (
+                <div className="search-suggest" role="listbox" aria-label="Suggestions">
+                  {suggestions.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      className="search-suggest-item"
+                      onClick={() => goToSuggestion(p.handle)}
+                    >
+                      <img src={p.image} alt="" loading="lazy" />
+                      <span style={{ display: "grid", gap: 2, minWidth: 0 }}>
+                        <span className="ss-title">{p.title}</span>
+                        <span className="ss-sub tnum">
+                          {p.price > 0 ? `From ${formatPrice(p.price)}` : "Rental · by quote"}
+                        </span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
             </form>
           )}
         </div>
@@ -149,7 +180,7 @@ export default function Header() {
             </button>
           </div>
           <nav className="mobile-menu-links" aria-label="Mobile">
-            {allNav.map((item, i) => (
+            {menuNav.map((item, i) => (
               <Link
                 key={item.to}
                 to={item.to}
@@ -162,7 +193,7 @@ export default function Header() {
             ))}
           </nav>
           <p style={{ color: "rgba(251,246,239,0.5)", fontSize: "0.85rem", fontWeight: 300 }}>
-            Brooklyn linen house — bringing sophistication and style to every celebration.
+            Brooklyn linen house — white-glove service across New York &amp; New Jersey.
           </p>
         </div>
       )}

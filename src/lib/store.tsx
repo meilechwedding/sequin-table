@@ -17,17 +17,24 @@ export type CartLine = {
   date?: string;
 };
 
+export type OrderPayment = {
+  /** e.g. "Visa", "Mastercard", "Amex" — demo-validated, never charged */
+  brand: string;
+  last4: string;
+  amount: number;
+};
+
 export type PlacedOrder = {
   id: string;
   placedAt: string;
   lines: CartLine[];
   name: string;
   total: number;
+  payment?: OrderPayment;
 };
 
 type StoreValue = {
   cart: CartLine[];
-  saved: string[];
   toast: string;
   drawerOpen: boolean;
   addToCart: (product: Product, variant?: string, qty?: number, date?: string) => void;
@@ -35,10 +42,9 @@ type StoreValue = {
   removeLine: (index: number) => void;
   setLineDate: (index: number, date: string) => void;
   clearCart: () => void;
-  toggleSaved: (productId: string) => void;
   showToast: (message: string) => void;
   setDrawerOpen: (open: boolean) => void;
-  placeOrder: (name: string) => PlacedOrder;
+  placeOrder: (name: string, payment?: OrderPayment) => PlacedOrder;
   lastOrder: PlacedOrder | null;
 };
 
@@ -70,7 +76,6 @@ export const cartTotals = (cart: CartLine[]) => {
 
 export function StoreProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartLine[]>(() => load("sequin.cart", []));
-  const [saved, setSaved] = useState<string[]>(() => load("sequin.saved", []));
   const [lastOrder, setLastOrder] = useState<PlacedOrder | null>(() =>
     load("sequin.lastOrder", null),
   );
@@ -80,9 +85,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     window.localStorage.setItem("sequin.cart", JSON.stringify(cart));
   }, [cart]);
-  useEffect(() => {
-    window.localStorage.setItem("sequin.saved", JSON.stringify(saved));
-  }, [saved]);
   useEffect(() => {
     if (!toast) return;
     const t = window.setTimeout(() => setToast(""), 2400);
@@ -103,7 +105,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         }
         return [...current, { productId: product.id, variant: chosen, qty, date }];
       });
-      setToast(product.price > 0 ? "Added to your cart" : "Added to your rental quote");
+      setToast(product.price > 0 ? "Added to your cart" : "Added to your quote");
     },
     [],
   );
@@ -126,16 +128,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => setCart([]), []);
 
-  const toggleSaved = useCallback((productId: string) => {
-    setSaved((current) =>
-      current.includes(productId)
-        ? current.filter((id) => id !== productId)
-        : [...current, productId],
-    );
-  }, []);
-
   const placeOrder = useCallback(
-    (name: string): PlacedOrder => {
+    (name: string, payment?: OrderPayment): PlacedOrder => {
       const id = `ST-${String(Math.floor(1000 + Math.random() * 9000))}`;
       const order: PlacedOrder = {
         id,
@@ -143,6 +137,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         lines: cart,
         name,
         total: cartTotals(cart).subtotal,
+        payment,
       };
       setLastOrder(order);
       window.localStorage.setItem("sequin.lastOrder", JSON.stringify(order));
@@ -155,7 +150,6 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       cart,
-      saved,
       toast,
       drawerOpen,
       addToCart,
@@ -163,13 +157,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       removeLine,
       setLineDate,
       clearCart,
-      toggleSaved,
       showToast,
       setDrawerOpen,
       placeOrder,
       lastOrder,
     }),
-    [cart, saved, toast, drawerOpen, addToCart, updateQty, removeLine, setLineDate, clearCart, toggleSaved, showToast, placeOrder, lastOrder],
+    [cart, toast, drawerOpen, addToCart, updateQty, removeLine, setLineDate, clearCart, showToast, placeOrder, lastOrder],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
+import { CreditCard, MessageCircle } from "lucide-react";
 import { formatPrice } from "../data/products";
 import { contact } from "../data/site";
 import { lineProduct, useStore } from "../lib/store";
@@ -10,6 +10,7 @@ export default function Confirmation() {
   const { id } = useParams();
   const { lastOrder } = useStore();
   const order = lastOrder && lastOrder.id === id ? lastOrder : null;
+  const hasRentals = order?.lines.some((l) => (lineProduct(l)?.price ?? 0) === 0) ?? false;
 
   return (
     <main className="wrap">
@@ -18,14 +19,18 @@ export default function Confirmation() {
           <span className="monogram-seal" style={{ width: 80, height: 80, fontSize: "1.2rem", color: "var(--accent-strong)", borderColor: "var(--line-strong)" }}>
             ST
           </span>
-          <span className="eyebrow eyebrow-center">Order Received</span>
+          <span className="eyebrow eyebrow-center">
+            {order?.payment ? "Payment Confirmed" : "Request Received"}
+          </span>
           <h1 className="display-lg" style={{ textWrap: "balance" }}>
             The Table Is in Good Hands{order?.name ? `, ${order.name.split(" ")[0]}` : ""}.
           </h1>
           {id && <span className="order-no tnum">{id}</span>}
           <p className="lede" style={{ textAlign: "center" }}>
-            We'll confirm every detail — sizes, dates, delivery, and any rental quote — by phone or
-            WhatsApp within one business day. Nothing is charged until you approve.
+            {hasRentals
+              ? "We'll confirm every detail — sizes, dates, delivery, and your rental quote — by phone or WhatsApp within one business day."
+              : "We'll confirm sizes and delivery by phone or WhatsApp within one business day."}{" "}
+            This boutique is in preview, so nothing was charged and nothing ships yet.
           </p>
 
           {order && order.lines.length > 0 && (
@@ -45,6 +50,15 @@ export default function Confirmation() {
                 );
               })}
               <hr className="hairline" />
+              {order.payment && (
+                <div className="summary-row">
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                    <CreditCard size={15} strokeWidth={1.7} />
+                    {order.payment.brand} ····{order.payment.last4}
+                  </span>
+                  <span className="tnum">{formatPrice(order.payment.amount)} · preview, not charged</span>
+                </div>
+              )}
               <div className="summary-row total">
                 <span>Home linen total</span>
                 <span className="tnum">{formatPrice(order.total)}</span>
@@ -52,7 +66,7 @@ export default function Confirmation() {
             </div>
           )}
 
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+          <div className="cta-row is-center">
             <a className="btn btn-gold" href={contact.whatsapp} target="_blank" rel="noreferrer">
               <MessageCircle size={16} strokeWidth={2} />
               WhatsApp Us

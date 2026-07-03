@@ -549,6 +549,67 @@ export const categories: ProductCategory[] = [
   "Textured",
 ];
 
+/** Color families power the swatch filter — one dot per family. */
+export type ColorFamilyName =
+  | "Ivory & White"
+  | "Cream & Taupe"
+  | "Gold"
+  | "Sage"
+  | "Blush"
+  | "Blue"
+  | "Espresso & Noir";
+
+export const colorFamilies: Array<{ name: ColorFamilyName; hex: string }> = [
+  { name: "Ivory & White", hex: "#f3eee6" },
+  { name: "Cream & Taupe", hex: "#c8b7a0" },
+  { name: "Gold", hex: "#d4a64d" },
+  { name: "Sage", hex: "#8d9874" },
+  { name: "Blush", hex: "#cf9d9c" },
+  { name: "Blue", hex: "#91a6b5" },
+  { name: "Espresso & Noir", hex: "#3a2a20" },
+];
+
+const colorFamilyById: Record<string, ColorFamilyName> = {
+  "home-flutter": "Ivory & White",
+  "home-lisbon-cream": "Cream & Taupe",
+  "home-lisbon-white": "Ivory & White",
+  "home-willow": "Sage",
+  "home-paloma-white": "Ivory & White",
+  "home-doria-eyelet": "Ivory & White",
+  "home-pendant-white": "Ivory & White",
+  "home-hamptons": "Ivory & White",
+  "home-taupe-pendant": "Cream & Taupe",
+  "home-taupe-velvet": "Cream & Taupe",
+  "home-topaz-gold": "Gold",
+  "home-topaz-blush": "Blush",
+  "home-hemstitched": "Cream & Taupe",
+  "rental-dolce-flutter": "Ivory & White",
+  "rental-hamptons": "Ivory & White",
+  "rental-doria-eyelet": "Ivory & White",
+  "rental-white-pendant": "Ivory & White",
+  "rental-taupe-pendant": "Cream & Taupe",
+  "rental-astoria": "Sage",
+  "rental-desert-plaid": "Cream & Taupe",
+  "rental-windowpane": "Blue",
+  "rental-golden-hour": "Gold",
+  "rental-white-boucle": "Ivory & White",
+  "rental-lisbon-cream": "Cream & Taupe",
+  "rental-espresso-ribbed": "Espresso & Noir",
+  "rental-mint-ribbed": "Sage",
+  "rental-rose-ribbed": "Blush",
+  "rental-paloma": "Ivory & White",
+  "rental-willow": "Sage",
+  "rental-ennis": "Ivory & White",
+  "rental-blue-toile": "Blue",
+  "rental-bee-ring": "Gold",
+  "rental-gold-moss": "Sage",
+  "rental-acrylic-black": "Espresso & Noir",
+  "rental-gold-blush": "Blush",
+};
+
+export const productColorFamily = (product: Product): ColorFamilyName =>
+  colorFamilyById[product.id] ?? "Ivory & White";
+
 export const featuredProducts = products.filter((product) => product.featured);
 
 export const heroProducts = products.filter((product) => product.heroAsset);

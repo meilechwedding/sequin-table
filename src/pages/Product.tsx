@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { CalendarDays, Heart, Plus } from "lucide-react";
+import { CalendarDays, Plus } from "lucide-react";
 import ProductCard from "../components/ProductCard";
 import { QtyStepper, Reveal } from "../components/bits";
 import { formatPrice, products } from "../data/products";
@@ -39,7 +39,7 @@ function Accordion({ items }: { items: Array<{ title: string; lines: string[] }>
 
 export default function ProductPage() {
   const { handle } = useParams();
-  const { addToCart, saved, toggleSaved, setDrawerOpen } = useStore();
+  const { addToCart, setDrawerOpen } = useStore();
 
   const product = useMemo(() => products.find((p) => p.handle === handle), [handle]);
   const [variant, setVariant] = useState<string | null>(null);
@@ -79,7 +79,6 @@ export default function ProductPage() {
   const related = products
     .filter((p) => p.id !== product.id && (p.category === product.category || p.collection === product.collection))
     .slice(0, 4);
-  const isSaved = saved.includes(product.id);
 
   const add = () => {
     if (isRental && !date) {
@@ -195,18 +194,15 @@ export default function ProductPage() {
             <div className="pdp-actions">
               <QtyStepper qty={qty} onDelta={(d) => setQty((q) => Math.max(1, q + d))} />
               <button className="btn btn-gold" onClick={add}>
-                {isRental ? "Reserve for My Event" : "Add to Cart"}
-              </button>
-              <button
-                className={`icon-btn${isSaved ? " is-saved" : ""}`}
-                style={{ width: 52, height: 52, border: "1px solid var(--line-strong)", color: isSaved ? "var(--color-bordeaux)" : undefined }}
-                aria-label={isSaved ? "Remove from saved" : "Save this piece"}
-                aria-pressed={isSaved}
-                onClick={() => toggleSaved(product.id)}
-              >
-                <Heart size={20} strokeWidth={1.7} fill={isSaved ? "currentColor" : "none"} />
+                {isRental ? "Add to Quote" : "Add to Cart"}
               </button>
             </div>
+            {isRental && (
+              <p className="field-hint" style={{ marginTop: -10 }}>
+                Quotes cost nothing — we confirm availability and pricing for your date within one
+                business day.
+              </p>
+            )}
 
             <Accordion items={accordionItems} />
           </div>

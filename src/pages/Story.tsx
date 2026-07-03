@@ -80,7 +80,7 @@ export default function Story() {
             {values.map((v, i) => (
               <Reveal key={v.title} delay={(i % 3) as 0 | 1 | 2}>
                 <div className="card step-card">
-                  <span className="rs-icon" style={{ width: 48, height: 48, borderRadius: "var(--radius-small)", display: "grid", placeItems: "center", background: "linear-gradient(150deg, #efddc0, #d8b484)", color: "#4a3517" }}>
+                  <span className="rs-icon" style={{ width: 48, height: 48, borderRadius: "var(--radius-mini)", display: "grid", placeItems: "center", background: "linear-gradient(150deg, #efddc0, #d8b484)", color: "#4a3517" }}>
                     <v.icon size={22} strokeWidth={1.6} />
                   </span>
                   <h3 className="display-sm">{v.title}</h3>
@@ -100,7 +100,7 @@ export default function Story() {
             <div style={{ display: "grid", justifyItems: "center", gap: 26, textAlign: "center" }}>
               <span className="monogram-seal">ST</span>
               <blockquote>“Set your table like the evening matters — because it does.”</blockquote>
-              <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
+              <div className="cta-row is-center">
                 <Link to="/rentals" className="btn btn-gold">Plan an Event</Link>
                 <Link to="/shop" className="btn btn-ghost" style={{ borderColor: "rgba(251,246,239,0.35)", color: "var(--color-cream-50)" }}>
                   Shop Home Linen
