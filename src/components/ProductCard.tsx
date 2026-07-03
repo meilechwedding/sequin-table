@@ -1,15 +1,17 @@
 import { Link } from "react-router-dom";
 import { CalendarDays, ShoppingBag } from "lucide-react";
 import { formatPrice, type Product } from "../data/products";
+import { useTilt } from "../lib/hooks";
 import { useStore } from "../lib/store";
 
 /**
  * A textile swatch: consistent 4:5 crop up top, a structured
  * "ticket" below — category + color dot, name, price/quote —
- * and exactly one CTA.
+ * and exactly one CTA. Tilts gently toward the pointer.
  */
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart, setDrawerOpen } = useStore();
+  const tilt = useTilt();
   const isRental = product.price === 0;
   const singleSize = !isRental && product.variants.length <= 1;
 
@@ -19,7 +21,7 @@ export default function ProductCard({ product }: { product: Product }) {
   };
 
   return (
-    <article className="product-card">
+    <article className="product-card" {...tilt}>
       <div className="pc-frame">
         <Link to={`/product/${product.handle}`} aria-label={`View ${product.title}`}>
           <img src={product.image} alt={product.title} loading="lazy" width={640} height={800} />

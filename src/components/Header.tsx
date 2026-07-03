@@ -69,11 +69,8 @@ export default function Header() {
 
   return (
     <>
-      <header
-        className={`site-header ${overNoir ? "header-dark" : "header-solid"}`}
-        style={{ position: "sticky" }}
-      >
-        <div className="wrap-wide" style={{ position: "relative" }}>
+      <header className={`site-header ${overNoir ? "header-dark" : "header-solid"}`}>
+        <div className="header-bar">
           <nav className="nav-links" aria-label="Primary">
             <button
               className="icon-btn menu-btn"

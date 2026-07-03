@@ -68,6 +68,24 @@ export const testimonials = [
     who: "D. Weiss",
     where: "Event Planner · Lakewood",
   },
+  {
+    quote:
+      "I bought the quilted cloth for Shabbos and it still looks new after a winter of dinners. It washes like a dream.",
+    who: "C. Braun",
+    where: "Home Collection · Flatbush",
+  },
+  {
+    quote:
+      "They swapped a color two days before the wedding without blinking. White-glove is not a slogan with them.",
+    who: "S. Halberstam",
+    where: "Wedding · Monsey",
+  },
+  {
+    quote:
+      "Photographers keep asking me where the linen is from. It does half the styling before the centerpieces arrive.",
+    who: "Y. Landau",
+    where: "Event Planner · Crown Heights",
+  },
 ];
 
 export type GalleryOccasion = "Weddings" | "Dinner Parties" | "Shabbos & Yom Tov" | "At Home";

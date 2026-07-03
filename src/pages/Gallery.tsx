@@ -1,15 +1,16 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { Reveal } from "../components/bits";
 import { galleryItems, galleryOccasions, occasionAccent } from "../data/site";
 import { products } from "../data/products";
-import { useDocTitle } from "../lib/hooks";
+import { useDocTitle, useTilt } from "../lib/hooks";
 
 export default function Gallery() {
   useDocTitle("Gallery");
   const [occasion, setOccasion] = useState<(typeof galleryOccasions)[number]>("All");
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const tilt = useTilt();
 
   const shown = useMemo(
     () => (occasion === "All" ? galleryItems : galleryItems.filter((g) => g.occasion === occasion)),
@@ -18,6 +19,27 @@ export default function Gallery() {
 
   const carried = (handle?: string) =>
     handle ? products.some((p) => p.handle === handle) : false;
+
+  const step = (delta: number) => {
+    setLightbox((i) => (i === null ? i : (i + delta + shown.length) % shown.length));
+  };
+
+  // keyboard: esc closes, arrows browse
+  useEffect(() => {
+    if (lightbox === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(null);
+      if (e.key === "ArrowRight") step(1);
+      if (e.key === "ArrowLeft") step(-1);
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lightbox === null]);
 
   return (
     <main>
@@ -47,7 +69,7 @@ export default function Gallery() {
         <Reveal>
           <div className="look-grid">
             {shown.map((item, i) => (
-              <article key={item.src} className="look-card">
+              <article key={item.src} className="look-card" {...tilt}>
                 <button
                   type="button"
                   className="look-frame"
@@ -81,11 +103,64 @@ export default function Gallery() {
       </div>
 
       {lightbox !== null && shown[lightbox] && (
-        <div className="lightbox" role="dialog" aria-modal="true" aria-label={shown[lightbox].alt} onClick={() => setLightbox(null)}>
-          <button className="icon-btn lb-close" aria-label="Close" onClick={() => setLightbox(null)}>
-            <X size={26} strokeWidth={1.6} />
-          </button>
-          <img src={shown[lightbox].src} alt={shown[lightbox].alt} onClick={(e) => e.stopPropagation()} />
+        <div
+          className="lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={shown[lightbox].alt}
+          onClick={() => setLightbox(null)}
+        >
+          <div className="lb-stage">
+            <button className="icon-btn lb-close" aria-label="Close" onClick={() => setLightbox(null)}>
+              <X size={26} strokeWidth={1.6} />
+            </button>
+            {shown.length > 1 && (
+              <>
+                <button
+                  className="lb-arrow lb-prev"
+                  aria-label="Previous image"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    step(-1);
+                  }}
+                >
+                  <ArrowLeft size={20} strokeWidth={1.6} />
+                </button>
+                <button
+                  className="lb-arrow lb-next"
+                  aria-label="Next image"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    step(1);
+                  }}
+                >
+                  <ArrowRight size={20} strokeWidth={1.6} />
+                </button>
+              </>
+            )}
+            <img
+              key={shown[lightbox].src}
+              className="lb-main"
+              src={shown[lightbox].src}
+              alt={shown[lightbox].alt}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+          {shown.length > 1 && (
+            <div className="lb-thumbs" onClick={(e) => e.stopPropagation()}>
+              {shown.map((item, i) => (
+                <button
+                  key={item.src}
+                  className={`lb-thumb${i === lightbox ? " is-active" : ""}`}
+                  aria-label={`View: ${item.alt}`}
+                  aria-current={i === lightbox}
+                  onClick={() => setLightbox(i)}
+                >
+                  <img src={item.src} alt="" loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </main>

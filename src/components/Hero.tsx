@@ -6,15 +6,15 @@ import { formatPrice } from "../data/products";
 import { productById } from "../lib/store";
 
 const INTERVAL = 7000;
-
-/** "Lisbon Ribbed White" → "LISBON"; "The Flutter Overlay" → "FLUTTER" */
-const ghostWord = (title: string) => title.replace(/^The\s+/i, "").split(" ")[0];
+const SWAP_MS = 1200;
 
 export default function Hero() {
   const [active, setActive] = useState(0);
+  const [leaving, setLeaving] = useState<number | null>(null);
   const [paused, setPaused] = useState(false);
   const [chipSwap, setChipSwap] = useState(false);
   const timer = useRef<number | null>(null);
+  const leaveTimer = useRef<number | null>(null);
   const stageRef = useRef<HTMLDivElement | null>(null);
 
   const slides = useMemo(
@@ -27,11 +27,17 @@ export default function Hero() {
 
   const go = useCallback(
     (next: number) => {
+      const target = ((next % slides.length) + slides.length) % slides.length;
       setChipSwap(true);
-      window.setTimeout(() => {
-        setActive(((next % slides.length) + slides.length) % slides.length);
-        setChipSwap(false);
-      }, 220);
+      setActive((current) => {
+        if (target !== current) {
+          setLeaving(current);
+          if (leaveTimer.current) window.clearTimeout(leaveTimer.current);
+          leaveTimer.current = window.setTimeout(() => setLeaving(null), SWAP_MS);
+        }
+        return target;
+      });
+      window.setTimeout(() => setChipSwap(false), 260);
     },
     [slides.length],
   );
@@ -54,7 +60,7 @@ export default function Hero() {
     });
   }, [slides]);
 
-  // gentle 3D parallax: cloth drifts with the pointer, ghost name drifts against it
+  // gentle 3D parallax: the cloth drifts with the pointer
   const onStageMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const el = stageRef.current;
@@ -80,6 +86,7 @@ export default function Hero() {
     <section
       className="hero on-dark"
       aria-label="Featured linens"
+      style={{ ["--stage-tint" as string]: current.tint }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -87,7 +94,7 @@ export default function Hero() {
       onTouchStart={() => setPaused(true)}
       onTouchEnd={() => setPaused(false)}
     >
-      <div className="hero-tint" style={{ ["--stage-tint" as string]: current.tint }} aria-hidden />
+      <div className="hero-tint" aria-hidden />
 
       <div className="hero-inner">
         <div className="hero-copy">
@@ -113,21 +120,15 @@ export default function Hero() {
           onMouseMove={onStageMove}
           onMouseLeave={onStageLeave}
         >
-          <div className="hero-ghost" aria-hidden>
-            {slides.map((slide, index) => (
-              <span
-                key={slide.productId}
-                className={index === active ? "is-active" : ""}
-              >
-                {ghostWord(slide.product!.title)}
-              </span>
-            ))}
-          </div>
+          <div className="hero-halo" aria-hidden />
+          <div className="hero-ring" aria-hidden />
 
           {slides.map((slide, index) => (
             <div
               key={slide.productId}
-              className={`hero-slide${index === active ? " is-active" : ""}`}
+              className={`hero-slide${index === active ? " is-active" : ""}${
+                index === leaving ? " is-leaving" : ""
+              }`}
               aria-hidden={index !== active}
             >
               <Link to={`/product/${slide.product!.handle}`} tabIndex={index === active ? 0 : -1} aria-label={`View ${slide.product!.title}`}>
@@ -163,12 +164,18 @@ export default function Hero() {
 
       <div className="hero-rail">
         <div className="wrap-wide">
-          <span className="hero-count tnum">
-            <b>{String(active + 1).padStart(2, "0")}</b> / {String(slides.length).padStart(2, "0")}
-          </span>
-          <span className="hero-progress" aria-hidden>
-            <span key={`${active}-${paused}`} className={paused ? "" : "is-running"} />
-          </span>
+          <div className="hero-dots" role="tablist" aria-label="Featured linens">
+            {slides.map((slide, index) => (
+              <button
+                key={slide.productId}
+                className={`hero-dot${index === active ? " is-active" : ""}`}
+                role="tab"
+                aria-selected={index === active}
+                aria-label={`Show ${slide.product!.title}`}
+                onClick={() => go(index)}
+              />
+            ))}
+          </div>
           <div className="hero-arrows">
             <button className="hero-arrow" aria-label="Previous linen" onClick={() => go(active - 1)}>
               <ArrowLeft size={18} strokeWidth={1.6} />

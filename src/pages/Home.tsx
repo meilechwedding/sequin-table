@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Instagram } from "lucide-react";
 import Hero from "../components/Hero";
 import ProductCard from "../components/ProductCard";
-import { Reveal, SectionHead } from "../components/bits";
+import { QuoteCarousel, Reveal, SectionHead } from "../components/bits";
 import { featuredProducts } from "../data/products";
 import { galleryItems, homeCopy, images, testimonials, contact } from "../data/site";
 import { useDocTitle } from "../lib/hooks";
@@ -104,47 +104,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Steps */}
+      {/* Testimonials — one voice at a time */}
       <section className="section">
         <div className="wrap">
-          <SectionHead eyebrow={homeCopy.stepsEyebrow} title={homeCopy.stepsTitle} center />
-          <div className="steps">
-            {homeCopy.steps.map((step, i) => (
-              <Reveal key={step.title} delay={(i % 3) as 0 | 1 | 2}>
-                <div className="card step-card">
-                  <span className="step-num foil-text tnum">{String(i + 1).padStart(2, "0")}</span>
-                  <h3 className="display-sm">{step.title}</h3>
-                  <p>{step.line}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="section" style={{ paddingTop: 0 }}>
-        <div className="wrap">
           <SectionHead eyebrow={homeCopy.quotesEyebrow} title={homeCopy.quotesTitle} center />
-          <div className="quotes">
-            {testimonials.map((t, i) => (
-              <Reveal key={t.who} delay={(i % 3) as 0 | 1 | 2}>
-                <figure className="card quote-card" style={{ margin: 0 }}>
-                  <blockquote style={{ margin: 0 }}>
-                    <q>{t.quote}</q>
-                  </blockquote>
-                  <figcaption className="quote-attr">
-                    <span className="who">{t.who}</span>
-                    <span className="where">{t.where}</span>
-                  </figcaption>
-                </figure>
-              </Reveal>
-            ))}
-          </div>
+          <Reveal>
+            <QuoteCarousel items={testimonials} />
+          </Reveal>
         </div>
       </section>
 
-      {/* Instagram */}
+      {/* Lookbook strip — grid on desktop, a door on phones + tablets */}
       <section className="section" style={{ paddingTop: 0 }}>
         <div className="wrap">
           <SectionHead eyebrow={homeCopy.igEyebrow} title={homeCopy.igTitle} center />
@@ -163,6 +133,12 @@ export default function Home() {
                   <Instagram size={22} strokeWidth={1.6} style={{ position: "absolute", width: 22, height: 22 }} />
                 </a>
               ))}
+            </div>
+            <div className="ig-mobile-cta cta-row is-center">
+              <Link to="/gallery" className="btn btn-dark">
+                View the Lookbook
+                <ArrowRight size={16} strokeWidth={2} />
+              </Link>
             </div>
           </Reveal>
         </div>
