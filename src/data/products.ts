@@ -555,5 +555,8 @@ export const heroProducts = products.filter((product) => product.heroAsset);
 
 export const productUrl = (product: Product) => `https://sequintable.com/products/${product.handle}`;
 
-export const formatPrice = (product: Product) =>
-  product.price > 0 ? `From $${product.price.toFixed(product.price % 1 === 0 ? 0 : 2)}` : "Inquire";
+export const formatPrice = (amount: number) =>
+  `$${amount.toLocaleString("en-US", {
+    minimumFractionDigits: amount % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  })}`;
